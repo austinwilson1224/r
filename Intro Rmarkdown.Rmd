@@ -38,8 +38,8 @@ data("precip")
 3.Which 5 cities receive the most rain? The least rain?
 ```{r}
 data = sort(precip, decreasing = TRUE)
-View(data)
-head(names(data))
+print(head(names(data)))
+print(tail(names(data), n=5))
 ```
 
 4.How many times larger is the rainfall in the rainiest city compared to the least rainy city?

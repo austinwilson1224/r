@@ -1,0 +1,88 @@
+---
+title: "Intro Rmarkdown"
+output:
+  html_document: default
+  pdf_document: default
+---
+
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r percip}
+data("precip")
+# summary(precip)
+# View(precip)
+```
+
+#Outcomes
+1.Create HTML report using Rstudio
+2.Embed plots in HTML
+3.Manipulate named vectors
+#Instructions
+1.In this homework, we’ll analyze R’s included precip dataset, which contains “Annual Precipitation in US Cities”.\n
+2.Answer the following questions, and show the R code you used to answer questions 2-6.\n
+3.Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.\n
+4.Hint: The following functions will help you- names, sort, head, tail, hist, %in%\n
+#Questions
+1.Rainfall is typically measured in units of length. Cross reference an external source to find out what units this data set is in. Cite your source with a hyperlink, as described in the web page (Links to an external site.).
+[precip data set information](https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/precip.html)
+
+2.Verify Sacramento is in the data.
+```{r}
+# names(precip)[6]
+"Sacramento" %in% names(precip)
+```
+
+3.Which 5 cities receive the most rain? The least rain?
+```{r}
+data = sort(precip, decreasing = TRUE)
+View(data)
+head(names(data))
+```
+
+4.How many times larger is the rainfall in the rainiest city compared to the least rainy city?
+```{r}
+first = data[1]
+last = tail(data, n=1)
+first[1]/last[1]
+```
+
+5.Which city is closest to the mean rainfall? The farthest from the mean rainfall?
+
+```{r}
+plot(data)
+mean(data)
+closest = data[42]
+closest
+furthest = 67-mean(data)
+furthest
+```
+
+6.Plot a histogram of precipitation. Interpret this histogram in one or two sentences.
+most cities have rainfall between 30-50 inches per year
+```{r}
+hist(precip)
+```
+
+7.The following plot represents this data. What other data are necessary to create this plot?
+latitude and longitude of each city
+8.What general patterns in annual precipitation does the following plot suggest?
+It rains more in the south and the northeast
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+[link](https://stackoverflow.com/questions/29787850/how-do-i-add-a-url-to-r-markdown)
+

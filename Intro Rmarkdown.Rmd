@@ -7,7 +7,7 @@ output:
 
 
 ```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
+knitr::opts_chunk$set(echo = FALSE)
 ```
 
 ```{r percip}
@@ -16,16 +16,26 @@ data("precip")
 # View(precip)
 ```
 
-#Outcomes
+# Outcomes
+
 1.Create HTML report using Rstudio
+
 2.Embed plots in HTML
+
 3.Manipulate named vectors
-#Instructions
-1.In this homework, we’ll analyze R’s included precip dataset, which contains “Annual Precipitation in US Cities”.\n
-2.Answer the following questions, and show the R code you used to answer questions 2-6.\n
-3.Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.\n
-4.Hint: The following functions will help you- names, sort, head, tail, hist, %in%\n
-#Questions
+
+# Instructions
+
+1.In this homework, we’ll analyze R’s included precip dataset, which contains “Annual Precipitation in US Cities”.
+
+2.Answer the following questions, and show the R code you used to answer questions 2-6.
+
+3.Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+
+4.Hint: The following functions will help you- names, sort, head, tail, hist, %in%
+
+# Questions
+
 1.Rainfall is typically measured in units of length. Cross reference an external source to find out what units this data set is in. Cite your source with a hyperlink, as described in the web page (Links to an external site.).
 [precip data set information](https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/precip.html)
 

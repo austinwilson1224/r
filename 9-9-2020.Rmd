@@ -1,0 +1,55 @@
+---
+title: "9-9-2020"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## make beautiful reports 
+
+this is a line
+newline
+<-- [anchor text](url) -->
+accouding to [wikipedia](https://en.wikipedia.org/wiki/markdown), Markdown is ...
+
+
+# H1 title
+
+## H2 title
+
+###  H3 title
+
+#### H4 title
+
+```{r}
+# r code 
+x = 1:10
+x **2
+```
+
+why is this bad?
+
+  - because 
+  - some reasons
+  
+## your turn
+```{r}
+x = runif(n=100, min = 0, max = 1)
+hist(x)
+mean_of_x = mean(x)
+```
+the mean of x a random sample of a random sample uniformly distributed is `r mean_of_x`
+
+
+
+
+
+
+
+```{r}
+x = rnorm(n=100,mean=0,sd=1)
+```
+
+

@@ -10,34 +10,14 @@ output:
 knitr::opts_chunk$set(echo = TRUE)
 ```
 
-```{r percip}
+```{r percip, echo=FALSE}
 data("precip")
-# summary(precip)
-# View(precip)
 ```
 
-# Outcomes
-
-1.Create HTML report using Rstudio
-
-2.Embed plots in HTML
-
-3.Manipulate named vectors
-
-# Instructions
-
-1.In this homework, we’ll analyze R’s included precip dataset, which contains “Annual Precipitation in US Cities”.
-
-2.Answer the following questions, and show the R code you used to answer questions 2-6.
-
-3.Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
-
-4.Hint: The following functions will help you- names, sort, head, tail, hist, %in%
-
-# Questions
 
 1.Rainfall is typically measured in units of length. Cross reference an external source to find out what units this data set is in. Cite your source with a hyperlink, as described in the web page (Links to an external site.).
-[precip data set information](https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/precip.html)
+
+  - [precip data set information](https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/precip.html)
 
 2.Verify Sacramento is in the data.
 ```{r}
@@ -46,13 +26,19 @@ data("precip")
 ```
 
 3.Which 5 cities receive the most rain? The least rain?
+
+  - Mobile, Miani, San Juan, New Orleans and Juneau have the most rain.
+  
+  - Boise, Albuquerque, El Paso, Reno and Phoenix have the least rain. 
 ```{r}
 data = sort(precip, decreasing = TRUE)
-print(head(names(data)))
+print(head(names(data), n=5))
 print(tail(names(data), n=5))
 ```
 
 4.How many times larger is the rainfall in the rainiest city compared to the least rainy city?
+
+  - Mobile has 9.57 times as much rainfall as Phoenix.
 ```{r}
 first = data[1]
 last = tail(data, n=1)
@@ -61,38 +47,33 @@ first[1]/last[1]
 
 5.Which city is closest to the mean rainfall? The farthest from the mean rainfall?
 
+  - The closest is the value which has smallest distance from the mean. By visual inspection Clevelend is closest to the mean. 
+
+  - The  furthest is the greater of the difference between the mean and the first or  last element in the ordered list. Since the last element is 7 (max) and the first  element is 67  (min) and the mean is 34.89, the 67 is further than 7 so the last element is the furthest from the mean. Mobile is the furthest from the mean. 
+
 ```{r}
-plot(data)
-mean(data)
-closest = data[42]
-closest
-furthest = 67-mean(data)
-furthest
+mean = mean(precip)
+first-mean
+mean-last
+data[42]
+
 ```
 
 6.Plot a histogram of precipitation. Interpret this histogram in one or two sentences.
-most cities have rainfall between 30-50 inches per year
+Most cities have rainfall between 30-50 inches per year.
 ```{r}
 hist(precip)
 ```
 
 7.The following plot represents this data. What other data are necessary to create this plot?
-latitude and longitude of each city
+
+  - The missing data to create this plot is latitude and longitude of each city.
+
 8.What general patterns in annual precipitation does the following plot suggest?
-It rains more in the south and the northeast
+
+  - It rains more in the south and the northeast. 
 
 
 
 
-
-
-
-
-
-
-
-
-
-
-[link](https://stackoverflow.com/questions/29787850/how-do-i-add-a-url-to-r-markdown)
 

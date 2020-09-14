@@ -17,7 +17,7 @@ data("precip")
 
 1.Rainfall is typically measured in units of length. Cross reference an external source to find out what units this data set is in. Cite your source with a hyperlink, as described in the web page (Links to an external site.).
 
-  - [precip data set information](https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/precip.html)
+  - The units are in inches: [precip data set information](https://stat.ethz.ch/R-manual/R-patched/library/datasets/html/precip.html)
 
 2.Verify Sacramento is in the data.
 ```{r}
@@ -47,20 +47,23 @@ first[1]/last[1]
 
 5.Which city is closest to the mean rainfall? The farthest from the mean rainfall?
 
-  - The closest is the value which has smallest distance from the mean. By visual inspection Clevelend is closest to the mean. 
+  - The closest is the value which has smallest distance from the mean. Clevelend is closest to the mean. 
+```{r}
+which.min(abs(precip - mean(precip)))
+```
+  
 
-  - The  furthest is the greater of the difference between the mean and the first or  last element in the ordered list. Since the last element is 7 (max) and the first  element is 67  (min) and the mean is 34.89, the 67 is further than 7 so the last element is the furthest from the mean. Mobile is the furthest from the mean. 
+  - The  furthest is the greater of the difference between the mean and the first or  last element in the ordered list. Since the last element is 7 (max) and the first  element is 67  (min) and the mean is 34.89, the 67 is further from the mean than 7 so the last element is the furthest from the mean. Mobile is the furthest from the mean. 
 
 ```{r}
 mean = mean(precip)
 first-mean
 mean-last
-data[42]
 
 ```
 
 6.Plot a histogram of precipitation. Interpret this histogram in one or two sentences.
-Most cities have rainfall between 30-50 inches per year.
+Most cities have average annual rainfall between 30-50 inches.
 ```{r}
 hist(precip)
 ```

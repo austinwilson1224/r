@@ -50,6 +50,7 @@ first[1]/last[1]
   - The closest is the value which has smallest distance from the mean. Clevelend is closest to the mean. 
 ```{r}
 which.min(abs(precip - mean(precip)))
+sort(abs(precip-mean))[1]
 ```
   
 

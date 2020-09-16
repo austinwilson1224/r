@@ -17,8 +17,9 @@ View(data)
 
 # 3. Plot a line plot of the columns "Daily.Mean.PM2.5.Concentration" as a function of "Date". 
 #    Start one month before the fire and go to the end of the data set. Comment on what the graph shows.
-with(data, plot(as.Date(Date, "%m/%d/%y"), Daily.Mean.PM2.5.Concentration, xlab="Date", ylab="Conecntration", type = "l"))
+# with(data, plot(as.Date(Date, "%m/%d/%y"), Daily.Mean.PM2.5.Concentration, xlab="Date", ylab="Conecntration", type = "l"))
 # plot(as.Date(data$Date, "%m/%d/%y"), data$Daily.Mean.PM2.5.Concentration, )
+plot(Daily.Mean.PM2.5.Concentration~Date, type = "l", data = data)
 
 
 # 4. Create a comparative boxplot of "Daily.Mean.PM2.5.Concentration" in the month before the fire and the month after the fire. 

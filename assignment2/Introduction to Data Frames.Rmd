@@ -1,0 +1,95 @@
+---
+title: Introduction to Data Frames
+author: TODO
+date: 20 September 2020
+---
+
+## Outcomes
+
+- Select subsets of rows of data frames
+- Manipulate data frames, for example, defining columns and permuting rows
+- Create line plots and comparative boxplots
+
+## Background
+
+Several [lightning fires](https://www.fire.ca.gov/incidents/2020/8/16/czu-lightning-complex-including-warnella-fire/) began after August 15th, 2020 in California. How did this affect air quality?
+
+One way to measure air quality after a fire is by particulate matter in the air.
+According to the [Environmental Protection Agency](https://www.epa.gov/pm-pollution/particulate-matter-pm-basics) (EPA) "PM stands for particulate matter (also called particle pollution): the term for a mixture of solid particles and liquid droplets found in the air.
+Some particles, such as dust, dirt, soot, or smoke, are large or dark enough to be seen with the naked eye.
+...
+PM2.5 : fine inhalable particles, with diameters that are generally 2.5 micrometers and smaller."
+In this assignment, we'll analyze data provided by the [EPA daily outdoor air quality](https://www.epa.gov/outdoor-air-quality-data/download-daily-data).
+
+## Instructions
+
+- Answer the following questions, and show all your R code.
+- Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+- Hint: The following functions will help you. `as.Date, plot, boxplot, order`
+
+# Questions
+
+Load the data.
+
+```{r}
+air = read.csv("http://webpages.csus.edu/fitzgerald/files/stat128/fall20/ad_viz_plotval_data.csv")
+```
+
+## 1
+
+> Pick a site from the column `Site.Name` in the data that you find personally interesting, and select the rows in the data frame that correspond to that site.
+> Use this subset for the remainder of the analysis.
+> Mention why this site interests you.
+
+```{r}
+# TODO code for Q1
+```
+
+TODO text for Q1
+
+## 2
+
+> Plot a line plot of the columns `Daily.Mean.PM2.5.Concentration` as a function of `Date`.
+> Start one month before the fire and go to the end of the data set.
+> Comment on what the graph shows.
+
+```{r}
+# TODO code for Q2
+```
+
+TODO text for Q2
+
+
+## 3
+
+> Create a comparative boxplot of "Daily.Mean.PM2.5.Concentration" in the month before the fire and the month after the fire.
+> Comment on what the boxplots show.
+> Hint: create a new column that indicates if the observation happened before or after the fire.
+
+```{r}
+# TODO code for Q3
+```
+
+TODO text for Q3
+
+
+## 4
+
+> Use your work above to implement the function below. 
+
+```{r}
+#' Plot the n most recent PM2.5 particle measurements on the y axis, with date as the x axis.
+#'
+#' @param d data frame containing columns Daily.Mean.PM2.5.Concentration and Date for a single site
+#' @param n number of observations to include
+plot_pm2.5 = function(d, n = 100)
+{
+  # TODO
+}
+```
+
+> Verify that `plot_pm2.5` works for `n = 100` and `n = 50`.
+
+```{r}
+# TODO
+```

@@ -1,0 +1,72 @@
+---
+title: 9-16
+author: TODO
+date: 20 September 2020
+---
+
+```{r}
+air = read.csv("http://webpages.csus.edu/fitzgerald/files/stat128/fall20/ad_viz_plotval_data.csv")
+View(air)
+```
+
+
+```{r}
+# TODO code for Q1
+
+# just a vector
+d = air$Date
+d = air[,"Date"]
+
+# data frame
+d_frame = air["Date"]
+
+# dates
+dates = as.Date(air[,"Date"], format = "%d/%m/%Y")
+View(air)
+```
+
+# plot pm2 as function of date
+
+```{r}
+plot(air$Daily.Mean.PM2.5.Concentration ~ as.Date(air$Date, "%m/%d/%y"))
+```
+
+# functions 
+  - input --> output
+
+```{r}
+air$Date = as.Date(air$Date, "%m/%d/%Y")
+class(air$Date)
+```
+
+
+# logical comparison
+```{r}
+l1 = c(TRUE,TRUE,FALSE)
+x = c(1,2,2,3,18)
+x_equal_2 = x == 2
+class(l1)
+x <= 2
+```
+
+```{r}
+d3 = head(dates)
+as.Date("2020-01-12") < d3
+```
+
+we can take a logical subset of rows - sometime called filtering / query
+get subset of rows that corresponds to El Dorado country
+```{r}
+air[,'COUNTY'] == "El Dorado"
+eldorado = air[air[,"COUNTY"] == "El Dorado",]
+eldorado2 = air[air$COUNTY == "El Dorado",]
+eldorado2
+head(eldorado2)
+```
+
+
+
+
+
+
+

@@ -44,7 +44,7 @@ air = read.csv("http://webpages.csus.edu/fitzgerald/files/stat128/fall20/ad_viz_
 ```{r}
 data = air[air[,"Site.Name"] == "Davis-UCD Campus",]
 data[,"Date"] = as.Date(x = data[,"Date"], format = "%m/%d/%Y")
-
+View(data)
 
 # alternatively 
 # data = air[air$Site.Name == 'Davis-UCD Campus',]
@@ -62,14 +62,14 @@ I picked Site.Name with the value 'Davis-UCD Campus' because I live in Davis.
 > The fires started on 8-17-2020 so I will use data starting on 7-17-2020.
 
 ```{r}
-boolean_mask = data[,"Date"] > as.Date("2020-07-17",format="%Y-%m-%d")
+boolean_mask = data[,"Date"] > as.Date("2020-07-17")
 fire_data = data[boolean_mask,]
 plot(Daily.Mean.PM2.5.Concentration ~ Date, type = "l", data = fire_data)
-
-
-# boolean_mask = data[,"Date"] > "2020-07-15"
-# data = data[boolean_mask,]
 # with(data = data, plot(Daily.Mean.PM2.5.Concentration~Date, type = "l"))
+
+
+
+
 ```
 
 This graph shows that before the fire the daily mean pm2.5 concentration was relatively low. After August 15 (the day the fires started) the daily mean pm2.5 concentration increased significantly. We can also see another massive increase more recently likely caused by the additional fire outbreaks.
@@ -82,8 +82,8 @@ This graph shows that before the fire the daily mean pm2.5 concentration was rel
 > Hint: create a new column that indicates if the observation happened before or after the fire.
 
 ```{r}
-before_boolean_mask = data[,"Date"] < "2020-08-17" & data[,"Date"] > "2020-07-15"
-after_boolean_mask = data[,"Date"] >= "2020-08-17"
+before_boolean_mask = data[,"Date"] < as.Date("2020-08-15") & data[,"Date"] > as.Date("2020-07-15")
+after_boolean_mask = data[,"Date"] >= as.Date("2020-08-15")
 
 
 
@@ -93,9 +93,9 @@ after = data[after_boolean_mask,]
 
 bp1 =boxplot(before$Daily.Mean.PM2.5.Concentration, after$Daily.Mean.PM2.5.Concentration, outline = FALSE, horizontal = TRUE, names = c("before fire", "after fire"), xlab="pm 2.5 concentration", col = c("blue","orange"))
 
-# with outliers
-bp2 = boxplot(before$Daily.Mean.PM2.5.Concentration, after$Daily.Mean.PM2.5.Concentration, horizontal = TRUE, names = c("before fire", "after fire"), xlab="pm 2.5 concentration", col = c("blue","orange"))
-bp1
+# with outliers necessary
+bp = boxplot(before$Daily.Mean.PM2.5.Concentration, after$Daily.Mean.PM2.5.Concentration, horizontal = TRUE, names = c("before fire", "after fire"), xlab="pm 2.5 concentration", col = c("blue","orange"))
+bp
 ```
 
 The boxplots show  a start difference in daily mean particules matter concentration (less than 2.5 mm). Starting with the "before fire" boxplot, we can see that the spread is very small. Before the fire the particulate matter is between 2.5 and 9. After the fire we see that shoot up to range between 17 and 84.7. Before the fire the particulate matter was very low. We see a low minimum, maximum and mean. After the fire the particulate matter is very high! We see a higher minimum than the maximum before the fire. We also see a much larger range, mean and maximum. 
@@ -115,7 +115,7 @@ plot_pm2.5 = function(d, n = 100)
   d = d[order(d$Date, decreasing = FALSE),] # to ensure data is sorted
   n_most_recent = tail(x = d, n = n)
   
-  plot(n_most_recent)
+  plot(Daily.Mean.PM2.5.Concentration ~ Date, data = n_most_recent, type="l")
 }
 ```
 

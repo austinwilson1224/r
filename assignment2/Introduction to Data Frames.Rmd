@@ -91,24 +91,12 @@ before_fire = data[before_fire_boolean_mask,]
 after_fire = data[after_fire_boolean_mask,]
 
 boxplot_fire =boxplot(before_fire$Daily.Mean.PM2.5.Concentration, after_fire$Daily.Mean.PM2.5.Concentration, horizontal = TRUE, names = c("before fire", "after fire"), xlab="pm 2.5 concentration", col = c("blue","orange"))
-
-
-# this is the data seperated before and after the smoke 
-before_smoke_boolean_mask = data[,"Date"] < as.Date("2020-08-17") & data[,"Date"] > as.Date("2020-07-17")
-after_smoke_boolean_mask = data[,"Date"] >= as.Date("2020-08-17")
-
-before_smoke = data[before_smoke_boolean_mask,]
-after_smoke = data[after_smoke_boolean_mask,]
-
-
-
-boxplot_fire =boxplot(before_smoke$Daily.Mean.PM2.5.Concentration, after_smoke$Daily.Mean.PM2.5.Concentration, horizontal = TRUE, names = c("before fire", "after fire"), xlab="pm 2.5 concentration", col = c("blue","orange"))
-
-# alternate solution
-data$before_fire = data$Date > as.Date("2020-07-17") & data$Date < as.Date("2020-08-15")
+# using a column that indicates  if fire happened before or after the fire
+fire_data[,"before_fire"] = fire_data[,"Date"] < as.Date("2020-08-15")
+boxplot(fire_data[,"Daily.Mean.PM2.5.Concentration"]~fire_data[,"before_fire"])
 ```
 
-The boxplots show  a start difference in daily mean particules matter concentration (less than 2.5 mm). Starting with the "before fire" boxplot, we can see that the spread is very small. Before the fire the particulate matter is between 2.5 and 9. After the fire we see that shoot up to range between 17 and 84.7. Before the fire the particulate matter was very low. We see a low minimum, maximum and mean. After the fire the particulate matter is very high! We see a higher minimum than the maximum before the fire. We also see a much larger range, mean and maximum. 
+The boxplots show  a start difference in daily mean particules matter concentration (less than 2.5 mm). Starting with the "before fire" boxplot, we can see that the spread is very small. Before the fire the particulate matter is between 2.5 and 9. After the fire we see that shoot up to range between 5.9 and 84.7. Before the fire the particulate matter was very low. We see a low minimum, maximum and mean. After the fire the particulate matter is very high!We  see a much larger range, median and maximum. If we just compare the median before and after the fire we see before is 5.75, after is  40.9. The median particulate matter increased by seven fold. 
 
 
 ## 4
@@ -122,7 +110,11 @@ The boxplots show  a start difference in daily mean particules matter concentrat
 #' @param n number of observations to include
 plot_pm2.5 = function(d, n = 100)
 {
-  d = d[order(d$Date, decreasing = FALSE),] # to ensure data is sorted
+  # date  was stored as date class in problem 1 
+  # d[,"Date"] = as.Date(d[,"Date"], "%m/%d/%Y")
+  
+  # to ensure data is sorted
+  d = d[order(d$Date, decreasing = FALSE),] 
   n_most_recent = tail(x = d, n = n)
   # n_most_recent2 = d[(dim(d)[1]-n):dim(d),]
   # print(n_most_recent2)

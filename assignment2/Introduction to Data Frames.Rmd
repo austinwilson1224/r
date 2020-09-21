@@ -60,10 +60,10 @@ I picked Site.Name with the value 'Davis-UCD Campus' because I live in Davis.
 > Start one month before the fire and go to the end of the data set.
 > Comment on what the graph shows.
 
-> The fires started on 8-17-2020 so I will use data starting on 7-17-2020.
+> The fires started on 8-15-2020 so I will use data starting on 7-15-2020.
 
 ```{r}
-boolean_mask = data[,"Date"] > as.Date("2020-07-17")
+boolean_mask = data[,"Date"] > as.Date("2020-07-15")
 fire_data = data[boolean_mask,]
 plot(Daily.Mean.PM2.5.Concentration ~ Date, type = "l", data = fire_data)
 # with(data = data, plot(Daily.Mean.PM2.5.Concentration~Date, type = "l"))
@@ -129,3 +129,35 @@ plot_pm2.5 = function(d, n = 100)
 plot_pm2.5(d = data) # n = 100 is default value 
 plot_pm2.5(d = data, n = 50)
 ```
+
+
+
+```{Rcpp}
+//  testing c++ stuff in r
+int add(int a,int b) {
+  return a + b;
+}
+
+// add(a = 2,b = 3);
+int test = add(2,3);
+
+```
+
+
+
+
+```{Rcpp}
+int myFunction() {
+  int x = 3;
+  return x;
+}
+
+int main() {
+  myFunction();
+  myFunction();
+  myFunction();
+  return 0;
+}
+```
+
+

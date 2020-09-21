@@ -55,6 +55,11 @@ Define a vectorized function `high` that accepts a sample vector `x` and impleme
 
 ```{r}
 # TODO define high
+high = function(x) {
+  win = x > 18
+  ifelse(win, 1, -1)
+  # ifeslse(x > 18, 1,  -1) 
+}
 ```
 
 Hint: Use `even(x)` below as a template.
@@ -77,6 +82,11 @@ Hint: you lose if X = 0.
 
 ```{r}
 # TODO define low
+low = function(x) {
+  win = x <= 18 & x > 0
+  sum(win)
+}
+low(x)
 ```
 
 
@@ -88,6 +98,9 @@ Define a vectorized function `straightup` that accepts `x`, a sample vector, and
 
 ```{r}
 # TODO define straightup
+straightup = function(x, d) {
+  
+}
 ```
 
 

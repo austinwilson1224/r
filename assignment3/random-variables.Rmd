@@ -1,0 +1,129 @@
+---
+title: Random Variables
+author: TODO
+date: 27 September 2020
+---
+
+#### Outcomes
+
+- Implement mathematical expressions in user defined functions
+- Write vectorized functions
+- Translate word problems and game rules into mathematics and code
+
+
+#### Background
+
+In this assignment we'll practice writing random variables using the game of Roulette.
+We'll use them in the next assignment to analyze and understand the game.
+
+A European roulette wheel has numbers 1-36 in red and black, and number 0 in green for a house win.
+The dealer spins the board, and the the ball lands randomly on one of these 37 numbers.
+Here's a brief [video introducing the rules of roulette](https://youtu.be/6nKBlWaRI8w).
+
+#### Instructions
+
+- Answer the following questions, and show all your R code.
+- Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+
+In the code that follows, think of `x` as a random variable uniformly distributed on the integers 0 through 36, representing the possible values for a game of roulette.
+Here's one way to produce a vector containing a sample of size `n` from `x`.
+
+```{r}
+n = 100
+roulette_values = 0:36
+x = sample(roulette_values, size = n, replace = TRUE)
+```
+
+# Questions
+
+## 1 - outside bet
+
+(3 points)
+
+The elements of our sample space are the roulette numbers: {0, 1, ..., 36}.
+In statistics, a random variable is a function that maps an element of the sample space to a real number.
+Let h(x) be a random variable representing the amount you win or lose for a bet on the high numbers defined as follows:
+
+$$
+h(x) = \begin{cases}
+-1 &\mbox{if } x \leq 18 \\
+1 & \mbox{if } 18 < x
+\end{cases}
+$$
+
+Define a vectorized function `high` that accepts a sample vector `x` and implements `h(x)`.
+
+```{r}
+# TODO define high
+```
+
+Hint: Use `even(x)` below as a template.
+
+```{r}
+even = function(x)
+{
+    win = (x %% 2 == 0) & (x != 0)
+    ifelse(win, 1, -1)
+}
+```
+
+
+## 2
+
+(3 points)
+
+Define a vectorized function `low` that accepts a sample vector `x` and returns the amount you win or lose if you bet one unit money on the low numbers, from 1 to 18.
+Hint: you lose if X = 0.
+
+```{r}
+# TODO define low
+```
+
+
+## 3 - straight up
+
+(3 points)
+
+Define a vectorized function `straightup` that accepts `x`, a sample vector, and `d`, a digit between  0 and 36, and returns the amount you win or lose in roulette if you bet one unit money on the single value `d`.
+
+```{r}
+# TODO define straightup
+```
+
+
+## 4 - something different
+
+(7 points)
+
+Pick another possible roulette bet that does not have a 1 to 1 payout, and implement an appropriately named vectorized function that accepts `x`, and returns the amount you win or lose in roulette if you bet one unit of money on the single value `d`.
+Write it in mathematical notation below as f(x).
+
+$$
+f(x) = TODO
+$$
+
+```{r}
+# TODO implement function
+```
+
+
+## 5
+
+(4 points)
+
+Calculate the expected value of your winnings after each play for each of the 4 betting strategies described above.
+It should be negative, because the house always wins.
+
+```{r}
+# 1
+# TODO
+
+# 2
+# TODO
+
+# 3
+# TODO
+
+# 4
+# TODO
+```

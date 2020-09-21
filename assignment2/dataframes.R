@@ -1,5 +1,6 @@
 # 1. Load the data with air = read.csv("http://webpages.csus.edu/fitzgerald/files/stat128/fall20/ad_viz_plotval_data.csv")
 air = read.csv("http://webpages.csus.edu/fitzgerald/files/stat128/fall20/ad_viz_plotval_data.csv")
+table(air)
 View(air)
 
 # 2. Pick a site from the column "Site.Name" in the data that you find personally interesting, 
@@ -51,4 +52,85 @@ View(after)
 # before = data[1883:1909,c("Daily.Mean.PM2.5.Concentration", "Date")]
 # after = data[1909:1935,c("Daily.Mean.PM2.5.Concentration", "Date")]
 boxplot(before$Daily.Mean.PM2.5.Concentration, after$Daily.Mean.PM2.5.Concentration)
+
+
+
+
+
+
+
+
+
+
+
+
+
+# JACKASS CREW! 
+air = read.csv("http://webpages.csus.edu/fitzgerald/files/stat128/fall20/ad_viz_plotval_data.csv")
+
+
+# 1
+air2 = air[air$Site.Name == "Sloughhouse",]
+
+
+# 2
+date = air2[,"Date"]
+date_2 = as.Date(date, "%m/%d/%Y")
+
+
+
+# logical vector 
+date_at = as.Date(air2[,"Date"],"%m/%d/%Y") > as.Date("2020-06-30")
+
+air3 = air2[date_at,]
+
+
+plot(x = as.Date(air3[,"Date"],"%m/%d/%Y"), y = air3[,"Daily.Mean.PM2.5.Concentration"], type="l")
+
+
+
+# 3 
+air3[,"before_fire"] = as.Date(air3[,"Date"], "%m/%d/%Y") < as.Date("2020-08-15") 
+
+boxplot(air3[,"Daily.Mean.PM2.5.Concentration"] ~ air3[,"before_fire"])
+
+
+
+# 4
+
+plot_pm2.5 = function(d, n = 100) {
+
+  # TODO: Make sure data is in order by date column
+  d[,"Date"] = as.Date(d[,"Date"], "%m/%d/%Y")
+  # to ensure data is sorted
+  # d = d[order(d$Date, decreasing = FALSE),] 
+  dn = tail(d, n)
+  pm2_n = dn[, "Daily.Mean.PM2.5.Concentration"]
+  date_n = dn[, "Date"]
+  plot(date_n, pm2_n, type = "l", xlab = "Date", ylab = "Daily Mean PM2 Concentration")
+  
+}
+
+
+
+
+
+
+plot_pm2.5(d = air, n = 50)
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 

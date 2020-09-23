@@ -98,9 +98,13 @@ Define a vectorized function `straightup` that accepts `x`, a sample vector, and
 
 ```{r}
 # TODO define straightup
-straightup = function(x, d) {
-  
+straightup = function(x, d, amount_bet = 1) {
+  win = x == d
+  lose = x != d
+  (sum(win) - sum(lose)) * amount_bet
 }
+straightup(x,13)
+x
 ```
 
 
@@ -117,6 +121,12 @@ $$
 
 ```{r}
 # TODO implement function
+even = function (x, amount_bet = 1)  {
+  win = (x %% 2 == 0) & (x != 0)
+  lose = !win
+  ((sum(win) / 2) - sum(lose)) * amount_bet
+}
+even(x)
 ```
 
 

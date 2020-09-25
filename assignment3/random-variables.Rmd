@@ -54,13 +54,12 @@ $$
 Define a vectorized function `high` that accepts a sample vector `x` and implements `h(x)`.
 
 ```{r}
-# TODO define high
+#  high
 high = function(x, amount_bet = 1) {
   win = x > 18
   # ifelse(win, 1, -1)
   ifelse(win, amount_bet,  -amount_bet) 
 }
-high(x)
 high_winnings = sum(high(x))
 ```
 

@@ -32,6 +32,8 @@ Here's one way to produce a vector containing a sample of size `n` from `x`.
 n = 100
 roulette_values = 0:36
 x = sample(roulette_values, size = n, replace = TRUE)
+tbl = table(x)
+tbl
 ```
 
 # Questions
@@ -60,7 +62,14 @@ high = function(x, amount_bet = 1) {
   # ifelse(win, 1, -1)
   ifelse(win, amount_bet,  -amount_bet) 
 }
-high(x)
+high_wins = high(x)
+tbl = table(high_wins)
+tbl
+sum(tbl)
+relative_tbl = tbl / sum(tbl)
+relative_tbl
+e_x = (-1) * relative_tbl[1] + (1) * relative_tbl[2]
+e_x
 ```
 
 Hint: Use `even(x)` below as a template.
@@ -85,10 +94,15 @@ Hint: you lose if X = 0.
 # TODO define low
 low = function(x, amount_bet = 1) {
   win = x <= 18 & x >= 1
-  sum(win) - sum(!win)
+  # sum(win) - sum(!win)
+  ifelse(win, 1,-1)
 }
 low(x)
-x
+tbl = table(low(x))
+relative_tbl = tbl / sum(tbl)
+relative_tbl
+e_x = (-1) * relative_tbl[1] + (1) * relative_tbl[2]
+e_x
 ```
 
 
@@ -104,9 +118,15 @@ straightup = function(x, d, amount_bet = 1) {
   win = x == d
   lose = x != d
   # print(sum(win) + sum(lose))
-  sum(win) * amount_bet - sum(lose)
+  # sum(win) * amount_bet - sum(lose)
+  ifelse(win, 35, -1)
 }
 straightup(x, 3)
+tbl = table(straightup(x,3))
+relative_tbl = tbl / sum(tbl)
+relative_tbl
+e_x = (-1) * relative_tbl[1] + (35) * relative_tbl[2]
+e_x
 ```
 
 
@@ -120,7 +140,7 @@ Write it in mathematical notation below as f(x).
 $$
 first\_dozen(x) = \begin{cases}
 -1 &\mbox{if } x > 12  \mbox{ or} \ x = 0\\
-1 & \mbox{if } 1 \leq x \leq 12
+2 & \mbox{if } 2 \leq x \leq 12
 \end{cases}
 $$
 
@@ -130,38 +150,56 @@ $$
 # first dozen
 first_dozen = function(x) {
   win = x %in% 1:12
-  sum(win) * 2 - sum(!win)
+  # sum(win) * 2 - sum(!win)
+  ifelse(win, 2, -1)
 }
 first_dozen(x)
 
 # second dozen
 second_dozen = function(x) {
   win = x %in% 13:24
-  sum(win) * 2 - sum(!win)
+  # sum(win) * 2 - sum(!win)
+  ifelse(win,2, -1)
 }
 second_dozen(x)
 thrid_dozen = function(x) {
   win = x %in% 25:36
-  sum(win) * 2 - sum(!win)
+  # sum(win) * 2 - sum(!win)
+  ifelse(win, 2, -1)
 }
 thrid_dozen(x)
 ```
+
+
+```{r}
+# expected value
+tbl = table(first_dozen(x))
+relative_tbl = tbl / sum(tbl)
+relative_tbl
+e_x = (-1) * relative_tbl[1] + (2) * relative_tbl[2]
+e_x
+```
+
+
 
 ```{r}
 # column bet 
 column1 = function(x) {
   win = x %in% c(1,4,7,10,13,16,19,22,25,28,31,34)
-  sum(win) * 2 - sum(!win)
+  # sum(win) * 2 - sum(!win)
+  ifelse(win, 2, -1)
 }
 column1(x)
 column2 = function(x) {
   win = x %in% c(2,5,8,11,14,17,20,23,26,29,32,35)
-  sum(win) * 2 - sum(!win)
+  # sum(win) * 2 - sum(!win)
+  ifelse(win, 2, -1)
 }
 column2(x)
 column3 = function(x) {
   win = x %in% c(3,6,9,12,15,18,21,24,27,30,33,36)
-  sum(win) * 2 - sum(!win)
+  # sum(win) * 2 - sum(!win)
+  ifelse(win, 2, -1)
 }
 column3(x)
 ```
@@ -169,7 +207,8 @@ column3(x)
 # top line .... payout 8x bet
 top_line = function(x) {
   win = ((x == 0) | (x == 1) | (x == 2) | (x == 3))
-  sum(win) * 8 - sum(!win)
+  # sum(win) * 8 - sum(!win)
+  ifelse(win, 8, -1)
 }
 top_line(x)
 table(x)
@@ -179,7 +218,8 @@ table(x)
 # street 11x payout street1 is default (1,2,3)
 street = function(x, street = c(1,2,3)) {
   win = x %in% street
-  sum(win) * 11 - sum(!win)
+  # sum(win) * 11 - sum(!win)
+  ifelse(win, 11, -1)
 }
 
 street1 = c(1,2,3)
@@ -205,7 +245,8 @@ E[X] = -1 * p(-1) + 1 * p(1)
 
 ```{r}
 # 1
-expected_value_high = (-1) * (19/37) + (1) * (18/37)
+# expected_value_high = (-1) * (19/37) + (1) * (18/37)
+
 
 
 # 2

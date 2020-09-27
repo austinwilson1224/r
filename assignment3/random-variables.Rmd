@@ -60,7 +60,7 @@ high = function(x, amount_bet = 1) {
   # ifelse(win, 1, -1)
   ifelse(win, amount_bet,  -amount_bet) 
 }
-high_winnings = sum(high(x))
+high(x)
 ```
 
 Hint: Use `even(x)` below as a template.
@@ -84,10 +84,11 @@ Hint: you lose if X = 0.
 ```{r}
 # TODO define low
 low = function(x, amount_bet = 1) {
-  win = x < 18 & x > 0
-  sum(win)
+  win = x <= 18 & x >= 1
+  sum(win) - sum(!win)
 }
-low_winnings = low(x)
+low(x)
+x
 ```
 
 
@@ -102,10 +103,10 @@ Define a vectorized function `straightup` that accepts `x`, a sample vector, and
 straightup = function(x, d, amount_bet = 1) {
   win = x == d
   lose = x != d
-  print(sum(win) + sum(lose))
-  (sum(win) - sum(lose)) * amount_bet * 36
+  # print(sum(win) + sum(lose))
+  sum(win) * amount_bet - sum(lose)
 }
-straightup_winnings = straightup(x, 3)
+straightup(x, 3)
 ```
 
 
@@ -117,58 +118,74 @@ Pick another possible roulette bet that does not have a 1 to 1 payout, and imple
 Write it in mathematical notation below as f(x).
 
 $$
-f(x) = TODO
+first\_dozen(x) = \begin{cases}
+-1 &\mbox{if } x > 12  \mbox{ or} \ x = 0\\
+1 & \mbox{if } 1 \leq x \leq 12
+\end{cases}
 $$
 
-```{r}
-# even / odd
-even = function (x, amount_bet = 1)  {
-  win = (x %% 2 == 0) & (x != 0)
-  lose = !win
-  (sum(win) - sum(lose)) * amount_bet
-}
-even_winnings = even(x)
-```
+
 
 ```{r}
-# red / black
-red_numbers = c(1,3,5,7,9,12,14,16,18,19,21,23,25,27,30,32,34,36)
-black_numbers = c(2,4,6,8,10,11,13,15,17,20,22,24,26,28,29,31,33,35)
-red = function(x, amount_bet = 1) {
-  win = x %in% red_numbers
-  # ifelse(win, 1, -1)
-  (sum(win) - sum(!win)) * amount_bet
+# first dozen
+first_dozen = function(x) {
+  win = x %in% 1:12
+  sum(win) * 2 - sum(!win)
 }
-red(x)
-black = function(x, amount_bet = 1) {
-  win = x %in% black_numbers
-  # ifelse(win, 1, -1)
-  (sum(win) - sum(!win)) * amount_bet
-}
+first_dozen(x)
 
-```
-
-```{r}
-# dozen bet
-low_dozen = 1:12
-mid_dozen = 13:24
-high_dozen = 25:36
-dozen = function(x, dozen, amount_bet = 1) {
-  win = x %in% dozen
-  (sum(win) - sum(!win)) * amount_bet * 2
+# second dozen
+second_dozen = function(x) {
+  win = x %in% 13:24
+  sum(win) * 2 - sum(!win)
 }
+second_dozen(x)
+thrid_dozen = function(x) {
+  win = x %in% 25:36
+  sum(win) * 2 - sum(!win)
+}
+thrid_dozen(x)
 ```
 
 ```{r}
 # column bet 
-column1 = c(1,4,7,10,13,16,19,22,25,28,31,34)
-column2 = c(2,5,8,11,14,17,20,23,26,29,32,35)
-column3 = c(3,6,9,12,15,18,21,24,27,30,33,36)
-column = function(x, column, amount_bet = 1) {
-  win = x %in% column
-  (sum(win) - sum(!win)) * amount_bet * 2
+column1 = function(x) {
+  win = x %in% c(1,4,7,10,13,16,19,22,25,28,31,34)
+  sum(win) * 2 - sum(!win)
 }
+column1(x)
+column2 = function(x) {
+  win = x %in% c(2,5,8,11,14,17,20,23,26,29,32,35)
+  sum(win) * 2 - sum(!win)
+}
+column2(x)
+column3 = function(x) {
+  win = x %in% c(3,6,9,12,15,18,21,24,27,30,33,36)
+  sum(win) * 2 - sum(!win)
+}
+column3(x)
 ```
+```{r}
+# top line .... payout 8x bet
+top_line = function(x) {
+  win = ((x == 0) | (x == 1) | (x == 2) | (x == 3))
+  sum(win) * 8 - sum(!win)
+}
+top_line(x)
+table(x)
+```
+
+```{r}
+# street 11x payout street1 is default (1,2,3)
+street = function(x, street = c(1,2,3)) {
+  win = x %in% street
+  sum(win) * 11 - sum(!win)
+}
+
+street1 = c(1,2,3)
+street(x,street1)
+```
+
 
 
 ## 5
@@ -184,26 +201,40 @@ E(X) = sum(x * p(x))
 
 X = amount of money won if you bet 1 unit of money on value x 
 
+E[X] = -1 * p(-1) + 1 * p(1)
+
 ```{r}
 # 1
-# expected value of high
-# X = the case where the ball lands on a number greater than or equal to 18 
-probability_high = 18 / 36
-expected_value_high = high_winnings * probability_high
-expected_value_high
+expected_value_high = (-1) * (19/37) + (1) * (18/37)
+
+
 # 2
-# expected value of low
-probability_low = 18 / 36
-expected_value_low = low_winnings * probability_low
-expected_value_low
+expected_value_low = (-1) * (19/37) + (1) * (18/37)
+
+
+
 # 3
-# if you win straight up then you win 36* your money
-probability_straightup = 1 / 36
-expected_value_straightup = straightup_winnings * probability_straightup
-expected_value_straightup
+# if you win straight up then you win 35x your money
+expected_value_straightup = (-1) * (36/37) + (35) * (1/37)
+
 # 4
-# if you win even
-probability_even = 18 / 36
-expected_value_even = even_winnings * probability_even
-expected_value_even
+# if you win column 1 then you get 2x your money
+expected_value_column = (-1) * (25/37) + (2) * (12/37)
+
+
+expected_value_top_line = (-1) * (33/37) + (8) * (4/37)
+
+expected_value_street = (-1) * (34/37) + (11) * (3/37)
+
+
+
+
+
+
+# other expected values 
+expected_value_even = (-1) * (19/37) + (1) * (18/37)
+expected_value_odd = (-1) * (19/37) + (1) * (18/37)
+
+expected_value_red = (-1) * (19/37) + (1) * (18/37)
+expected_value_black = (-1) * (19/37) + (1) * (18/37)
 ```

@@ -32,8 +32,6 @@ Here's one way to produce a vector containing a sample of size `n` from `x`.
 n = 100
 roulette_values = 0:36
 x = sample(roulette_values, size = n, replace = TRUE)
-tbl = table(x)
-tbl
 ```
 
 # Questions
@@ -57,28 +55,9 @@ Define a vectorized function `high` that accepts a sample vector `x` and impleme
 
 ```{r}
 #  high
-high = function(x, amount_bet = 1) {
+h = function(x) {
   win = x > 18
-  # ifelse(win, 1, -1)
-  ifelse(win, amount_bet,  -amount_bet) 
-}
-high_wins = high(x)
-tbl = table(high_wins)
-tbl
-sum(tbl)
-relative_tbl = tbl / sum(tbl)
-relative_tbl
-e_x = (-1) * relative_tbl[1] + (1) * relative_tbl[2]
-e_x
-```
-
-Hint: Use `even(x)` below as a template.
-
-```{r}
-even = function(x)
-{
-    win = (x %% 2 == 0) & (x != 0)
-    ifelse(win, 1, -1)
+  ifelse(win, 1,  -1) 
 }
 ```
 
@@ -91,18 +70,11 @@ Define a vectorized function `low` that accepts a sample vector `x` and returns 
 Hint: you lose if X = 0.
 
 ```{r}
-# TODO define low
 low = function(x, amount_bet = 1) {
   win = x <= 18 & x >= 1
-  # sum(win) - sum(!win)
   ifelse(win, 1,-1)
+  # sum(win) - sum(!win)
 }
-low(x)
-tbl = table(low(x))
-relative_tbl = tbl / sum(tbl)
-relative_tbl
-e_x = (-1) * relative_tbl[1] + (1) * relative_tbl[2]
-e_x
 ```
 
 
@@ -113,20 +85,11 @@ e_x
 Define a vectorized function `straightup` that accepts `x`, a sample vector, and `d`, a digit between  0 and 36, and returns the amount you win or lose in roulette if you bet one unit money on the single value `d`.
 
 ```{r}
-# TODO define straightup if you win straighup then you get 36 * your money back 
-straightup = function(x, d, amount_bet = 1) {
+straightup = function(x, d) {
   win = x == d
-  lose = x != d
-  # print(sum(win) + sum(lose))
-  # sum(win) * amount_bet - sum(lose)
+  # sum(win) * amount_bet - sum(!win)
   ifelse(win, 35, -1)
 }
-straightup(x, 3)
-tbl = table(straightup(x,3))
-relative_tbl = tbl / sum(tbl)
-relative_tbl
-e_x = (-1) * relative_tbl[1] + (35) * relative_tbl[2]
-e_x
 ```
 
 
@@ -140,7 +103,7 @@ Write it in mathematical notation below as f(x).
 $$
 first\_dozen(x) = \begin{cases}
 -1 &\mbox{if } x > 12  \mbox{ or} \ x = 0\\
-2 & \mbox{if } 2 \leq x \leq 12
+2 & \mbox{if } 1 \leq x \leq 12
 \end{cases}
 $$
 
@@ -153,7 +116,6 @@ first_dozen = function(x) {
   # sum(win) * 2 - sum(!win)
   ifelse(win, 2, -1)
 }
-first_dozen(x)
 
 # second dozen
 second_dozen = function(x) {
@@ -161,24 +123,14 @@ second_dozen = function(x) {
   # sum(win) * 2 - sum(!win)
   ifelse(win,2, -1)
 }
-second_dozen(x)
 thrid_dozen = function(x) {
   win = x %in% 25:36
   # sum(win) * 2 - sum(!win)
   ifelse(win, 2, -1)
 }
-thrid_dozen(x)
 ```
 
 
-```{r}
-# expected value
-tbl = table(first_dozen(x))
-relative_tbl = tbl / sum(tbl)
-relative_tbl
-e_x = (-1) * relative_tbl[1] + (2) * relative_tbl[2]
-e_x
-```
 
 
 
@@ -186,22 +138,20 @@ e_x
 # column bet 
 column1 = function(x) {
   win = x %in% c(1,4,7,10,13,16,19,22,25,28,31,34)
+  # win = x %in% seq(1,34,3)
   # sum(win) * 2 - sum(!win)
   ifelse(win, 2, -1)
 }
-column1(x)
 column2 = function(x) {
   win = x %in% c(2,5,8,11,14,17,20,23,26,29,32,35)
   # sum(win) * 2 - sum(!win)
   ifelse(win, 2, -1)
 }
-column2(x)
 column3 = function(x) {
   win = x %in% c(3,6,9,12,15,18,21,24,27,30,33,36)
   # sum(win) * 2 - sum(!win)
   ifelse(win, 2, -1)
 }
-column3(x)
 ```
 ```{r}
 # top line .... payout 8x bet
@@ -210,22 +160,14 @@ top_line = function(x) {
   # sum(win) * 8 - sum(!win)
   ifelse(win, 8, -1)
 }
-top_line(x)
-table(x)
-```
 
-```{r}
 # street 11x payout street1 is default (1,2,3)
 street = function(x, street = c(1,2,3)) {
   win = x %in% street
   # sum(win) * 11 - sum(!win)
   ifelse(win, 11, -1)
 }
-
-street1 = c(1,2,3)
-street(x,street1)
 ```
-
 
 
 ## 5
@@ -244,28 +186,53 @@ X = amount of money won if you bet 1 unit of money on value x
 E[X] = -1 * p(-1) + 1 * p(1)
 
 ```{r}
+# not a fan of this problem
 # 1
 # expected_value_high = (-1) * (19/37) + (1) * (18/37)
+high_results = h(roulette_values)
+high_tbl = table(high_results)
+relative_tbl_high = high_tbl / sum(high_tbl)
+expected_value_high = (-1) * relative_tbl_high[1] + (1) * relative_tbl_high[2]
+expected_value_high = as.numeric(expected_value_high)
 
 
 
 # 2
-expected_value_low = (-1) * (19/37) + (1) * (18/37)
+# expected_value_low = (-1) * (19/37) + (1) * (18/37)
+
+low_results = low(roulette_values)
+low_tbl = table(low_results)
+relative_tbl_low = low_tbl / sum(low_tbl)
+expected_value_low = (-1) * relative_tbl_low[1] + (1) * relative_tbl_low[2]
+expected_value_low = as.numeric(expected_value_low)
 
 
 
 # 3
-# if you win straight up then you win 35x your money
-expected_value_straightup = (-1) * (36/37) + (35) * (1/37)
+# expected_value_straightup = (-1) * (36/37) + (35) * (1/37)
+straightup_results = straightup(roulette_values,3)
+straightup_tbl = table(straightup_results)
+relative_tbl_straightup = straightup_tbl / sum(straightup_tbl)
+expected_value_straightup = (-1) * relative_tbl_straightup[1] + (35) * relative_tbl_straightup[2]
+expected_value_straightup = as.numeric(expected_value_straightup)
 
-# 4
-# if you win column 1 then you get 2x your money
-expected_value_column = (-1) * (25/37) + (2) * (12/37)
+# 4 -- using expected value of the first column containing values 1,4,7,10,13,16,19,22,25,28,31,3
+# expected_value_column = (-1) * (25/37) + (2) * (12/37)
+first_dozen_results = first_dozen(roulette_values)
+first_dozen_tbl = table(first_dozen_results)
+relative_tbl_first_dozen = first_dozen_tbl / sum(first_dozen_tbl)
+expected_value_first_dozen = (-1) * relative_tbl_first_dozen[1] + (2) * relative_tbl_first_dozen[2]
+expected_value_first_dozen = as.numeric(expected_value_first_dozen)
 
 
-expected_value_top_line = (-1) * (33/37) + (8) * (4/37)
 
-expected_value_street = (-1) * (34/37) + (11) * (3/37)
+
+expected_value_high
+expected_value_low
+expected_value_straightup
+expected_value_first_dozen
+
+
 
 
 
@@ -273,9 +240,12 @@ expected_value_street = (-1) * (34/37) + (11) * (3/37)
 
 
 # other expected values 
-expected_value_even = (-1) * (19/37) + (1) * (18/37)
-expected_value_odd = (-1) * (19/37) + (1) * (18/37)
-
-expected_value_red = (-1) * (19/37) + (1) * (18/37)
-expected_value_black = (-1) * (19/37) + (1) * (18/37)
+# expected_value_top_line = (-1) * (33/37) + (8) * (4/37)
+# expected_value_street = (-1) * (34/37) + (11) * (3/37)
+# expected_value_even = (-1) * (19/37) + (1) * (18/37)
+# expected_value_odd = (-1) * (19/37) + (1) * (18/37)
+# expected_value_red = (-1) * (19/37) + (1) * (18/37)
+# expected_value_black = (-1) * (19/37) + (1) * (18/37)
 ```
+
+

@@ -411,12 +411,7 @@ h(x) = \begin{cases}
 h = function(x) {
   win = x &gt; 18
   ifelse(win, 1,  -1) 
-}
-h(x)</code></pre>
-<pre><code>##   [1]  1 -1 -1  1 -1  1  1  1  1  1 -1  1 -1  1  1  1 -1 -1 -1 -1  1 -1  1  1  1
-##  [26]  1 -1  1  1  1  1 -1  1  1 -1  1 -1  1 -1 -1 -1  1 -1  1 -1 -1  1 -1  1 -1
-##  [51] -1 -1 -1 -1  1  1  1  1 -1  1  1 -1  1 -1 -1  1 -1  1  1 -1 -1  1  1 -1  1
-##  [76] -1 -1  1  1 -1 -1  1 -1 -1 -1  1 -1  1 -1 -1  1 -1  1  1 -1  1  1  1  1  1</code></pre>
+}</code></pre>
 </div>
 <div id="section" class="section level2">
 <h2>2</h2>
@@ -426,12 +421,7 @@ h(x)</code></pre>
   win = x &lt;= 18 &amp; x &gt;= 1
   ifelse(win, 1,-1)
   # sum(win) - sum(!win)
-}
-low(x)</code></pre>
-<pre><code>##   [1] -1  1  1 -1  1 -1 -1 -1 -1 -1  1 -1  1 -1 -1 -1  1  1  1  1 -1  1 -1 -1 -1
-##  [26] -1  1 -1 -1 -1 -1  1 -1 -1  1 -1  1 -1  1  1  1 -1  1 -1 -1  1 -1  1 -1  1
-##  [51]  1  1  1  1 -1 -1 -1 -1  1 -1 -1  1 -1  1  1 -1  1 -1 -1  1  1 -1 -1  1 -1
-##  [76]  1  1 -1 -1  1  1 -1  1 -1  1 -1  1 -1  1  1 -1  1 -1 -1  1 -1 -1 -1 -1 -1</code></pre>
+}</code></pre>
 </div>
 <div id="straight-up" class="section level2">
 <h2>3 - straight up</h2>
@@ -441,12 +431,7 @@ low(x)</code></pre>
   win = x == d
   # sum(win) * amount_bet - sum(!win)
   ifelse(win, 35, -1)
-}
-straightup(x,3)</code></pre>
-<pre><code>##   [1] -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 35 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-##  [26] -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1
-##  [51] -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 35 -1 -1 -1 -1 -1 -1 -1 -1 35 -1
-##  [76] -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 35 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1</code></pre>
+}</code></pre>
 </div>
 <div id="something-different" class="section level2">
 <h2>4 - something different</h2>
@@ -464,23 +449,14 @@ first_dozen = function(x) {
   # sum(win) * 2 - sum(!win)
   ifelse(win, 2, -1)
 }
-first_dozen(x)</code></pre>
-<pre><code>##   [1] -1  2  2 -1  2 -1 -1 -1 -1 -1  2 -1  2 -1 -1 -1  2 -1 -1 -1 -1  2 -1 -1 -1
-##  [26] -1 -1 -1 -1 -1 -1  2 -1 -1  2 -1 -1 -1 -1  2 -1 -1 -1 -1 -1 -1 -1  2 -1 -1
-##  [51] -1 -1  2  2 -1 -1 -1 -1  2 -1 -1  2 -1 -1  2 -1  2 -1 -1  2  2 -1 -1  2 -1
-##  [76] -1  2 -1 -1 -1  2 -1  2 -1  2 -1 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1 -1 -1 -1</code></pre>
-<pre class="r"><code># second dozen
+
+# second dozen
 second_dozen = function(x) {
   win = x %in% 13:24
   # sum(win) * 2 - sum(!win)
   ifelse(win,2, -1)
 }
-second_dozen(x)</code></pre>
-<pre><code>##   [1] -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1 -1  2 -1 -1 -1  2  2  2  2 -1  2 -1 -1
-##  [26] -1  2  2  2  2 -1 -1 -1 -1 -1  2  2 -1  2 -1  2  2  2  2 -1  2 -1 -1 -1  2
-##  [51]  2  2 -1 -1 -1  2 -1 -1 -1 -1  2 -1 -1  2 -1 -1 -1 -1  2 -1 -1  2 -1 -1  2
-##  [76]  2 -1  2 -1  2 -1 -1 -1 -1 -1 -1  2 -1 -1  2 -1 -1  2 -1 -1  2 -1  2 -1  2</code></pre>
-<pre class="r"><code>thrid_dozen = function(x) {
+thrid_dozen = function(x) {
   win = x %in% 25:36
   # sum(win) * 2 - sum(!win)
   ifelse(win, 2, -1)
@@ -565,26 +541,21 @@ expected_value_first_dozen = as.numeric(expected_value_first_dozen)
 
 
 
-# expected_value_high
-# expected_value_low
-# expected_value_straightup
-# expected_value_first_dozen
-
-
-
-
-
-
-
-
-# other expected values 
+expected_value_high</code></pre>
+<pre><code>## [1] -0.02702703</code></pre>
+<pre class="r"><code>expected_value_low</code></pre>
+<pre><code>## [1] -0.02702703</code></pre>
+<pre class="r"><code>expected_value_straightup</code></pre>
+<pre><code>## [1] -0.02702703</code></pre>
+<pre class="r"><code>expected_value_first_dozen</code></pre>
+<pre><code>## [1] -0.02702703</code></pre>
+<pre class="r"><code># other expected values 
 # expected_value_top_line = (-1) * (33/37) + (8) * (4/37)
 # expected_value_street = (-1) * (34/37) + (11) * (3/37)
 # expected_value_even = (-1) * (19/37) + (1) * (18/37)
 # expected_value_odd = (-1) * (19/37) + (1) * (18/37)
 # expected_value_red = (-1) * (19/37) + (1) * (18/37)
 # expected_value_black = (-1) * (19/37) + (1) * (18/37)</code></pre>
-<p>expected value high: -0.027027 expected value low: -0.027027 expected value straight up: -0.027027 expected_value_first_dozen: -0.027027</p>
 </div>
 </div>
 

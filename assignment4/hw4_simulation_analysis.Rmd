@@ -1,0 +1,181 @@
+---
+title: Analyzing Simulations
+date: 4 October 2020
+---
+
+#### Outcomes
+
+- Visualize and compare complex data
+- Use higher order functions
+- Explain unfamiliar code written by another person
+
+
+#### Background
+
+As promised, in this assignment we will use the functions representing random variables that we developed in the previous assignment to explore different strategies for playing the game of roulette.
+
+#### Instructions
+
+- Don't be constrained by the questions.
+    If you want to ask something deeper, then go for it!
+- Answer the following questions, and show all your R code.
+- Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+
+Below are some functions and code you can use to complete the assignment.
+
+```{r, echo = FALSE}
+even = function(x)
+{
+    win = (x %% 2 == 0) & (x != 0)
+    ifelse(win, 1, -1)
+}
+
+
+high = function(x)
+{
+    win = (18 < x) & (x != 0)
+    ifelse(win, 1, -1)
+}
+
+
+column1 = function(x)
+{
+    ifelse(x %% 3 == 1, 2, -1)
+}
+
+
+straightup = function(x, d = 1)
+{
+    ifelse(x == d, 35, -1)
+}
+
+
+# Construct a simple betting strategy
+simple_strategy = function(bet = even)
+{
+    function(x) cumsum(bet(x))
+}
+
+
+#' Simulate plays from a betting strategy
+#'
+#' @param strategy
+#' @param nplayers number of players to use this strategy
+#' @param ntimes number of times each player should play
+play = function(strategy = simple_strategy()
+    , nplayers = 100L
+    , ntimes = 1000L
+    , ballvalues = 0:36
+){
+    replicate(nplayers, strategy(sample(ballvalues, size = ntimes, replace = TRUE)))
+}
+```
+
+
+# Questions
+
+## 1 - Simple strategies
+
+> Create at least one visualization for at least one of the betting strategies above.
+> For example, we can simulate how much a single player wins at each time if she sits down and plays 20 games, always betting one unit of money on even, as follows.
+
+```{r, echo = FALSE}
+library(ggplot2)
+theme_set(theme_bw())  # Feel free to set different themes
+
+set.seed(893) # Starts the random number generator at a particular place, so the graph will look the same for everyone.
+ntimes = 20
+d = data.frame(time = seq(ntimes))
+s = simple_strategy(even)
+d$winnings = play(s, nplayers = 1, ntimes = ntimes)
+
+g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
+g = g + geom_line(aes(time, winnings), data = d)
+print(g)
+```
+
+> One fun visualization is to draw many partially overlapping opaque lines, with each line representing a sequence of winnings by a single player.
+> You can also add:
+> 
+> - A line for the expected value of winnings at each point in time
+> - A line for the actual simulated average won by each player at each point in time
+> - Labeled vertical and horizontal lines representing typical player behavior, or casino betting limits.
+> 
+> Comment on your visualization(s).
+> What does it show?
+> What questions does it answer?
+
+```{r}
+# TODO create visualization(s)
+```
+
+TODO explain visualization(s)
+
+
+## 1 - Martingale strategy
+
+> The simplest [martingale strategy](https://en.wikipedia.org/wiki/Martingale_(betting_system)) for betting on a game with nearly equal chances of win and loss is to start with the minimum bet, and then double your previous bet every time you lose.
+> If you win, then you again start fresh by betting the minimum amount.
+> It's possible to use this strategy in roulette, but what will happen?
+
+```{r}
+doublebet = function(x, initialbet = 1, strategy = even)
+{
+    winnings = rep(NA, length(x))
+    betsize = initialbet
+    current_winnings = 0
+    for(i in seq_along(x)){
+        if(strategy(x[i]) == 1){
+            current_winnings = current_winnings + betsize
+            betsize = initialbet
+        } else {
+            current_winnings = current_winnings - betsize
+            betsize = 2 * betsize
+        }
+        winnings[i] = current_winnings
+    }
+    winnings
+}
+```
+
+> `doublebet` implements the basic martingale doubling strategy (very inefficiently 😬, but that's fine for now).
+> Describe in detail what this function does, and how you believe it works.
+> What are the arguments?
+> What kind of objects makes sense to pass in as arguments?
+
+TODO: explain `doublebet`.
+
+
+## 3 - Analyzing the martingale strategy
+
+> We can simulate from the martingale strategy as follows.
+
+```{r, echo = FALSE}
+ntimes = 30
+m = data.frame(time = seq(ntimes))
+m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
+
+g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
+g = g + geom_line(aes(time, winnings), data = m)
+print(g)
+```
+
+> Simulate and investigate different scenarios to create at least one visualization of the martingale strategy.
+> Comment on your visualization(s) and address the following.
+>
+> 1. Under what assumptions does the martingale strategy work in theory?
+> 2. Could the martingale strategy work in practice, given table limits?
+> 3. Is it good or bad for casinos if players use the martingale strategy?
+>       Does it depend on whether the casino is large or small?
+
+```{r}
+# TODO create visualization(s)
+```
+
+TODO explain visualization(s)
+
+
+## 4 - Advising a friend
+
+> Suppose someone you care about is going to visit Las Vegas, and is enthusiastic about the martingale strategy, but they have no background in math and logic.
+> Explain to this person, in simple terms, what the best strategy is for them to play roulette and why.

@@ -107,6 +107,8 @@ print(g)
 
 ```{r}
 # TODO create visualization(s)
+# not betting strategy
+not_bet = function(x) rep(0, length(x))
 ```
 
 TODO explain visualization(s)

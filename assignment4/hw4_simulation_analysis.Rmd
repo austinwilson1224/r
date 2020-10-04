@@ -87,7 +87,7 @@ play = function(strategy = simple_strategy()
 > 
 > Comment on your visualization(s).
 > What does it show? My visualization shows the winnings for 100 different players over the course of 1000 bets. They are using the straightup betting strategy. The blue line is 0 and the red line is the average of their winnings after each round of betting. 
-> What questions does it answer? The question this answers is if betting will win in the long term. You can see that the average winnings are trending down. Also we can see that there is a large spread between different gamblers. The lowest having lost $500 and the highest winning about $700. It also answers the question of if 
+> What questions does it answer? The question this answers is if betting will win in the long term. You can see that the average winnings are trending down. Also we can see that there is a large spread between different gamblers. The lowest having lost $500 and the highest winning about $700. 
 
 ```{r}
 library(ggplot2)

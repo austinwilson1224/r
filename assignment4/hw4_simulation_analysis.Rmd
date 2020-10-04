@@ -107,46 +107,46 @@ print(g)
 # 1 There are my results using 2000 bets and 12 different players using straightup strategy
 
 ```{r}
-# library(ggplot2)
-# theme_set(theme_bw())  # Feel free to set different themes
-# 
-# set.seed(42)
-# ntimes = 2000
-# d = data.frame(time = seq(ntimes))
-# s = simple_strategy(straightup)
-# 
-# # val = 0
-# # test_name = 'winnings' + str(val)
-# # val = str(0)
-# # val
-# # val = 0
-# # test = paste(c("winnings",val), collapse="")
-# # test
-# d$winnings = play(s, nplayers = 1, ntimes = ntimes)
-# g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
-# 
-# average = d$winnings
-# # average
-# for(i in 0:10) {
-#     set.seed(i)
-#     ntimes = 2000
-#     d = data.frame(time = seq(ntimes))
-#     s = simple_strategy(straightup)
-#     column_name = paste(c("winnings",i), collapse="")
-#     d$winnings = play(s, nplayers = 1, ntimes = ntimes)
-#     average = average + d$winnings
-#     g = g + geom_line(aes(time, winnings), data = d, alpha=.4)
-#     # print(g)
-# }
-# 
-# average = average / 12
-# plot(average, type = "l")
-# # g = g + abline(a = average[1], b = average[-1])
+library(ggplot2)
+theme_set(theme_bw())  # Feel free to set different themes
+
+set.seed(42)
+ntimes = 2000
+d = data.frame(time = seq(ntimes))
+s = simple_strategy(straightup)
+
+# val = 0
+# test_name = 'winnings' + str(val)
+# val = str(0)
+# val
+# val = 0
+# test = paste(c("winnings",val), collapse="")
+# test
+d$winnings = play(s, nplayers = 1, ntimes = ntimes)
+g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
+
+average = d$winnings
+# average
+for(i in 0:100) {
+    set.seed(i)
+    ntimes = 2000
+    d = data.frame(time = seq(ntimes))
+    s = simple_strategy(straightup)
+    column_name = paste(c("winnings",i), collapse="")
+    d$winnings = play(s, nplayers = 1, ntimes = ntimes)
+    average = average + d$winnings
+    g = g + geom_line(aes(time, winnings), data = d, alpha=.4)
+    # print(g)
+}
+
+average = average / 12
+plot(average, type = "l")
+# g = g + abline(a = average[1], b = average[-1])
 # g = g + line()
-# 
+
 # View(d)
-# 
-# print(g)
+
+print(g)
 ```
 
 
@@ -177,6 +177,9 @@ TODO explain visualization(s)
 > The simplest [martingale strategy](https://en.wikipedia.org/wiki/Martingale_(betting_system)) for betting on a game with nearly equal chances of win and loss is to start with the minimum bet, and then double your previous bet every time you lose.
 > If you win, then you again start fresh by betting the minimum amount.
 > It's possible to use this strategy in roulette, but what will happen?
+
+- Since the bets are growing exponentially, you will eventually go bankrupt using this strategy. You need infinite wealth to recoup all losses. The expected value is zero. 
+
 
 ```{r}
 doublebet = function(x, initialbet = 1, strategy = even)
@@ -215,7 +218,9 @@ doublebet = function(x, initialbet = 1, strategy = even)
 
 - Strategy should be passed a function which dictates how the gambler will attempt to win. 
 
-> TODO: explain `doublebet`.
+> TODO: explain `doublebet`. 
+
+- Double bet takes in a vector of values that the table will roll (x), an initial bet and a strategy. It creates a winnings vector the same length of x to store all the money won (or lost) usint the betting strategy. The function then loops through all the values in x. It passes each value in x to the betting strategy function (even) and checks if the x value was a winning value (the case where strategy returns 1). If the bet won then betsize is reset to initialbet (the minimum value). If the x value was a losing value then the betsize is doubled. 
 
 
 ## 3 - Analyzing the martingale strategy
@@ -223,22 +228,44 @@ doublebet = function(x, initialbet = 1, strategy = even)
 > We can simulate from the martingale strategy as follows.
 
 ```{r, echo = FALSE}
-ntimes = 30
-m = data.frame(time = seq(ntimes))
-m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
 
-g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
-g = g + geom_line(aes(time, winnings), data = m)
+for(i in 0:5) {
+    set.seed(i)
+    ntimes = 30
+    m = data.frame(time = seq(ntimes))
+    m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
+
+    g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for     a single roulette player following the basic martingale betting strategy.")
+    g = g + geom_line(aes(time, winnings), data = m)
+    # print(g)
+    
+}
 print(g)
+# ntimes = 30
+# m = data.frame(time = seq(ntimes))
+# m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
+# 
+# g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
+# g = g + geom_line(aes(time, winnings), data = m)
+# print(g)
 ```
 
 > Simulate and investigate different scenarios to create at least one visualization of the martingale strategy.
 > Comment on your visualization(s) and address the following.
 >
 > 1. Under what assumptions does the martingale strategy work in theory?
+
+- The martingale strategy works, in theory, when the gambler has infinite wealth and the odds are 50/50. 
+
 > 2. Could the martingale strategy work in practice, given table limits?
+
+- Yes. As long as you have enough money to keep doubling your bet when you lose.
+
 > 3. Is it good or bad for casinos if players use the martingale strategy?
 >       Does it depend on whether the casino is large or small?
+
+- I would say it is good. The odds are always slightly in the casinos favor because half the numbers are even, half are odd but 0 is neither and the house wins. The only plays that can use martingale have near 50/50 odds. But not exactly. 
+
 
 ```{r}
 # TODO create visualization(s)
@@ -251,3 +278,5 @@ TODO explain visualization(s)
 
 > Suppose someone you care about is going to visit Las Vegas, and is enthusiastic about the martingale strategy, but they have no background in math and logic.
 > Explain to this person, in simple terms, what the best strategy is for them to play roulette and why.
+
+- The best strategy is to not go at all. The expected value of the margingale strategy is zero. Why waste you time gambling if you can expect to make nothing in the long run?

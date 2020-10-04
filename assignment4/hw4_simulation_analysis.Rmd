@@ -71,86 +71,12 @@ play = function(strategy = simple_strategy()
 }
 ```
 
-
-# win then walk away strategy
-
-```{r}
-win_walk = function(bet = even) {
-    0
-}
-```
-
-
-
 # Questions
 
 ## 1 - Simple strategies
 
 > Create at least one visualization for at least one of the betting strategies above.
 > For example, we can simulate how much a single player wins at each time if she sits down and plays 20 games, always betting one unit of money on even, as follows.
-
-```{r, echo = FALSE}
-library(ggplot2)
-theme_set(theme_bw())  # Feel free to set different themes
-
-set.seed(893) # Starts the random number generator at a particular place, so the graph will look the same for everyone.
-ntimes = 200
-d = data.frame(time = seq(ntimes))
-s = simple_strategy(column1)
-d$winnings = play(s, nplayers = 1, ntimes = ntimes)
-
-g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
-g = g + geom_line(aes(time, winnings), data = d)
-print(g)
-```
-
-# 1 There are my results using 2000 bets and 12 different players using straightup strategy
-
-```{r}
-library(ggplot2)
-theme_set(theme_bw())  # Feel free to set different themes
-
-set.seed(42)
-ntimes = 2000
-d = data.frame(time = seq(ntimes))
-s = simple_strategy(straightup)
-
-# val = 0
-# test_name = 'winnings' + str(val)
-# val = str(0)
-# val
-# val = 0
-# test = paste(c("winnings",val), collapse="")
-# test
-d$winnings = play(s, nplayers = 1, ntimes = ntimes)
-g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
-
-average = d$winnings
-# average
-for(i in 0:100) {
-    set.seed(i)
-    ntimes = 2000
-    d = data.frame(time = seq(ntimes))
-    s = simple_strategy(straightup)
-    column_name = paste(c("winnings",i), collapse="")
-    d$winnings = play(s, nplayers = 1, ntimes = ntimes)
-    average = average + d$winnings
-    g = g + geom_line(aes(time, winnings), data = d, alpha=.4)
-    # print(g)
-}
-
-average = average / 12
-plot(average, type = "l")
-# g = g + abline(a = average[1], b = average[-1])
-# g = g + line()
-
-# View(d)
-
-print(g)
-```
-
-
-
 
 > One fun visualization is to draw many partially overlapping opaque lines, with each line representing a sequence of winnings by a single player.
 > You can also add:
@@ -160,19 +86,41 @@ print(g)
 > - Labeled vertical and horizontal lines representing typical player behavior, or casino betting limits.
 > 
 > Comment on your visualization(s).
-> What does it show? My visualization shows the winnings for 12 different players and 2000 bets
-> What questions does it answer? This doesn't anwser any questions, but we can see the trend in winnings
+> What does it show? My visualization shows the winnings for 100 different players over the course of 1000 bets. They are using the straightup betting strategy. The blue line is 0 and the red line is the average of their winnings after each round of betting. 
+> What questions does it answer? The question this answers is if betting will win in the long term. You can see that the average winnings are trending down. Also we can see that there is a large spread between different gamblers. The lowest having lost $500 and the highest winning about $700. It also answers the question of if 
 
 ```{r}
-# TODO create visualization(s)
-# not betting strategy
-not_bet = function(x) rep(0, length(x))
+library(ggplot2)
+theme_set(theme_bw())  # Feel free to set different themes
+set.seed(42)
+ntimes = 1000
+d = data.frame(time = seq(ntimes))
+s = simple_strategy(straightup)
+d$winnings = play(s, nplayers = 1, ntimes = ntimes)
+g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
+g = g + geom_line(aes(time, winnings), data = d, alpha=.2)
+# average
+count = 1
+d$average = d$winnings
+for(i in 2:100) {
+    set.seed(i)
+    ntimes = 1000
+    #d = data.frame(time = seq(ntimes))
+    s = simple_strategy(straightup)
+    column_name = paste(c("winnings",i), collapse="")
+    d$winnings = play(s, nplayers = 1, ntimes = ntimes)
+    g = g + geom_line(aes(time, winnings), data = d, alpha=.2)
+    # average
+    count = count + 1
+    d$average = d$average + d$winnings
+}
+d$average = d$average / count
+g = g + geom_line(aes(time, average), data = d, col = "red")
+g = g + geom_abline(slope = 0, intercept = 0, col = "blue")
+print(g)
 ```
 
-TODO explain visualization(s)
-
-
-## 1 - Martingale strategy
+## 2 - Martingale strategy
 
 > The simplest [martingale strategy](https://en.wikipedia.org/wiki/Martingale_(betting_system)) for betting on a game with nearly equal chances of win and loss is to start with the minimum bet, and then double your previous bet every time you lose.
 > If you win, then you again start fresh by betting the minimum amount.
@@ -228,26 +176,14 @@ doublebet = function(x, initialbet = 1, strategy = even)
 > We can simulate from the martingale strategy as follows.
 
 ```{r, echo = FALSE}
+ntimes = 30
+m = data.frame(time = seq(ntimes))
+m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
 
-for(i in 0:5) {
-    set.seed(i)
-    ntimes = 30
-    m = data.frame(time = seq(ntimes))
-    m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
-
-    g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for     a single roulette player following the basic martingale betting strategy.")
-    g = g + geom_line(aes(time, winnings), data = m)
-    # print(g)
-    
-}
+g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
+g = g + geom_line(aes(time, winnings), data = m)
 print(g)
-# ntimes = 30
-# m = data.frame(time = seq(ntimes))
-# m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
-# 
-# g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
-# g = g + geom_line(aes(time, winnings), data = m)
-# print(g)
+# View(m)
 ```
 
 > Simulate and investigate different scenarios to create at least one visualization of the martingale strategy.
@@ -268,10 +204,28 @@ print(g)
 
 
 ```{r}
-# TODO create visualization(s)
+ntimes = 1000
+m = data.frame(time = seq(ntimes))
+m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
+m$average = m$winnings
+count = 1
+g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
+g = g + geom_line(aes(time, winnings), data = m, alpha = .2)
+
+for(i in 1:4) {
+    m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
+    m$average = m$average + m$winnings
+    count = count + 1
+    g = g + geom_line(aes(time, winnings), data = m, alpha = .2)
+}
+m$average = m$average / count
+g = g + geom_line(aes(time, average), data = m, color = "blue")
+
+print(g)
+# View(m)
 ```
 
-TODO explain visualization(s)
+- My visualization shows how this strategy will bankrupt someone over the long term. Due the the exponential nature of this betting strategy, there may be a situation where you have to bet more than you have in order to recoup your losses. This graph shows that. It also shows that if you do have infinite resources, this is a winning strategy. If I go to Vegas with my friends, and we each make 1000 bets, the blue line is how much we expect to make.
 
 
 ## 4 - Advising a friend
@@ -279,4 +233,4 @@ TODO explain visualization(s)
 > Suppose someone you care about is going to visit Las Vegas, and is enthusiastic about the martingale strategy, but they have no background in math and logic.
 > Explain to this person, in simple terms, what the best strategy is for them to play roulette and why.
 
-- The best strategy is to not go at all. The expected value of the margingale strategy is zero. Why waste you time gambling if you can expect to make nothing in the long run?
+- The best strategy is to not go at all. The expected value of the martingale strategy is zero. Why waste you time gambling if you can expect to make nothing in the long run? If you are dead set on gambling, I would advice to use the martingale strategy but with a losing limit. If you lose more than \$100 you should walk away and not try and win it back. This is the next best strategy because if you lose, then double your bet, you have the change to win back the money you lost. If you don't double your bet after having lost $100, then you aren't in a terrible situation. 

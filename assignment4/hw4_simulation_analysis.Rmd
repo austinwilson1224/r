@@ -72,6 +72,16 @@ play = function(strategy = simple_strategy()
 ```
 
 
+# win then walk away strategy
+
+```{r}
+win_walk = function(bet = even) {
+    0
+}
+```
+
+
+
 # Questions
 
 ## 1 - Simple strategies
@@ -84,15 +94,63 @@ library(ggplot2)
 theme_set(theme_bw())  # Feel free to set different themes
 
 set.seed(893) # Starts the random number generator at a particular place, so the graph will look the same for everyone.
-ntimes = 20
+ntimes = 200
 d = data.frame(time = seq(ntimes))
-s = simple_strategy(even)
+s = simple_strategy(column1)
 d$winnings = play(s, nplayers = 1, ntimes = ntimes)
 
 g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
 g = g + geom_line(aes(time, winnings), data = d)
 print(g)
 ```
+
+# 1 There are my results using 2000 bets and 12 different players using straightup strategy
+
+```{r}
+# library(ggplot2)
+# theme_set(theme_bw())  # Feel free to set different themes
+# 
+# set.seed(42)
+# ntimes = 2000
+# d = data.frame(time = seq(ntimes))
+# s = simple_strategy(straightup)
+# 
+# # val = 0
+# # test_name = 'winnings' + str(val)
+# # val = str(0)
+# # val
+# # val = 0
+# # test = paste(c("winnings",val), collapse="")
+# # test
+# d$winnings = play(s, nplayers = 1, ntimes = ntimes)
+# g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
+# 
+# average = d$winnings
+# # average
+# for(i in 0:10) {
+#     set.seed(i)
+#     ntimes = 2000
+#     d = data.frame(time = seq(ntimes))
+#     s = simple_strategy(straightup)
+#     column_name = paste(c("winnings",i), collapse="")
+#     d$winnings = play(s, nplayers = 1, ntimes = ntimes)
+#     average = average + d$winnings
+#     g = g + geom_line(aes(time, winnings), data = d, alpha=.4)
+#     # print(g)
+# }
+# 
+# average = average / 12
+# plot(average, type = "l")
+# # g = g + abline(a = average[1], b = average[-1])
+# g = g + line()
+# 
+# View(d)
+# 
+# print(g)
+```
+
+
+
 
 > One fun visualization is to draw many partially overlapping opaque lines, with each line representing a sequence of winnings by a single player.
 > You can also add:
@@ -102,8 +160,8 @@ print(g)
 > - Labeled vertical and horizontal lines representing typical player behavior, or casino betting limits.
 > 
 > Comment on your visualization(s).
-> What does it show?
-> What questions does it answer?
+> What does it show? My visualization shows the winnings for 12 different players and 2000 bets
+> What questions does it answer? This doesn't anwser any questions, but we can see the trend in winnings
 
 ```{r}
 # TODO create visualization(s)
@@ -142,10 +200,22 @@ doublebet = function(x, initialbet = 1, strategy = even)
 
 > `doublebet` implements the basic martingale doubling strategy (very inefficiently 😬, but that's fine for now).
 > Describe in detail what this function does, and how you believe it works.
+
+- 
+
 > What are the arguments?
+
+- The arguments are x which is a vector of values to that the ball lands on. Initial bet has the default value of 1. This is the initial amount of money bet on the first value in x. Strategy is the betting strategy that will be used. This is being passed a function, the default value is even. This is the strategy of betting that will be used. 
+
 > What kind of objects makes sense to pass in as arguments?
 
-TODO: explain `doublebet`.
+- x should be a vector of values that will be the winning number. These values should be between 0 and 36. They should be randomly selected because this is a game of chance. 
+
+- Initial bet should be whatever you want to start out betting at. I think 1 makes sense. Maybe you're feeling lucky and start out betting $100. 
+
+- Strategy should be passed a function which dictates how the gambler will attempt to win. 
+
+> TODO: explain `doublebet`.
 
 
 ## 3 - Analyzing the martingale strategy

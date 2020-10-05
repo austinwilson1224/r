@@ -162,7 +162,7 @@ doublebet = function(x, initialbet = 1, strategy = even)
 
 - x should be a vector of values that will be the winning number. These values should be between 0 and 36. They should be randomly selected because this is a game of chance. 
 
-- Initial bet should be whatever you want to start out betting at. I think 1 makes sense. Maybe you're feeling lucky and start out betting $100. 
+- Initial bet should be whatever you want to start out betting at. I think 1 makes sense. Maybe you're feeling lucky and start out betting $100. The default value is 1. 
 
 - Strategy should be passed a function which dictates how the gambler will attempt to win. 
 
@@ -183,7 +183,6 @@ m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
 g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
 g = g + geom_line(aes(time, winnings), data = m)
 print(g)
-# View(m)
 ```
 
 > Simulate and investigate different scenarios to create at least one visualization of the martingale strategy.
@@ -200,7 +199,7 @@ print(g)
 > 3. Is it good or bad for casinos if players use the martingale strategy?
 >       Does it depend on whether the casino is large or small?
 
-- I would say it is good. The odds are always slightly in the casinos favor because half the numbers are even, half are odd but 0 is neither and the house wins. The only plays that can use martingale have near 50/50 odds. But not exactly. 
+- I would say it is generally bad for casinos. It seems that there is an upward trend in winnings for the gambler. This means that the casino is losing money. This is especially true if the gambler has a lot of money and can keep doubling their bet even after very large losses. Eventually they will win it back. No because the gambler is not winning a lot of money when they do win. Since they are only betting the minimum when they win there is not a lot of risk. There would be risk to a small casino of going bankrupt if they could not pay out the winning of someone who won a lot. After 1000 bets my graph shows that these people would make $500. So it does not depend whether the casino is large or small. The only time a gambler is winning a large amount is after they have lost almost just as much. 
 
 
 ```{r}
@@ -212,7 +211,7 @@ count = 1
 g = ggplot() + labs(title = "The Martingale Strategy in Roulette", caption = "Simulated winnings over time for a single roulette player following the basic martingale betting strategy.")
 g = g + geom_line(aes(time, winnings), data = m, alpha = .2)
 
-for(i in 1:4) {
+for(i in 1:3) {
     m$winnings = play(doublebet, nplayers = 1, ntimes = ntimes)
     m$average = m$average + m$winnings
     count = count + 1
@@ -222,7 +221,6 @@ m$average = m$average / count
 g = g + geom_line(aes(time, average), data = m, color = "blue")
 
 print(g)
-# View(m)
 ```
 
 - My visualization shows how this strategy will bankrupt someone over the long term. Due the the exponential nature of this betting strategy, there may be a situation where you have to bet more than you have in order to recoup your losses. This graph shows that. It also shows that if you do have infinite resources, this is a winning strategy. If I go to Vegas with my friends, and we each make 1000 bets, the blue line is how much we expect to make.

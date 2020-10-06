@@ -1,0 +1,110 @@
+---
+title: Covid Cases
+date: 11 October 2020
+---
+
+#### Outcomes
+
+- Download and load public data sets
+- Read and interpret metadata
+- Evaluate general claims using data, in the presence of missing data
+- Create and interpret interaction plots
+
+
+#### Instructions
+
+- Answer the following questions, and show all your R code.
+- Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+
+Download the [COVID-19 Case Surveillance Public Use Data](https://data.cdc.gov/Case-Surveillance/COVID-19-Case-Surveillance-Public-Use-Data/vbim-akqf) from the US Center for Disease Control (CDC).
+Click on the "Export" button in the top right corner next to download the actual data set.
+
+_Hint: It might be useful to create a new numeric column for severity based on the values of the `hosp, icu, death` columns.
+If you do this, make sure you explain the meaning and rationale behind your choices._
+
+
+# Questions
+
+## 1 - Reading the Documentation
+
+_a) Describe this data set at a high level.
+What does each row represent?_
+
+TODO - your answer
+
+_b) How many rows and columns do you expect to see based on the website?
+Load the data into R.
+Is this reflected in the data?_
+
+```{r}
+# TODO: load data and look at dimensions
+```
+
+TODO - your answer
+
+
+## 2 - Missing Data
+ 
+_There are few `NA` values in this data, but much of the data is missing, unknown, or blank.
+Which columns have the highest proportion of missing data?
+Why might these be missing?_
+
+```{r}
+# TODO
+```
+
+TODO - your answer
+
+
+## 3 - Age Risk
+
+_The [CDC states](https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/older-adults.html) "Among adults, the risk for severe illness from COVID-19 increases with age, with older adults at highest risk."
+Does the data support this claim?_
+
+_Hint 1: It might be useful to think about these COVID illness rates by age after adjusting     for the relative sizes of each age group in the country.
+You'll need to bring in another data source to do this._
+
+
+```{r}
+# TODO
+```
+
+TODO - your answer
+
+
+## 4 - Medical Condition Risk
+
+_The [CDC states](https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/people-with-medical-conditions.html) "People of any age with certain underlying medical conditions are at increased risk for severe illness from COVID-19"
+Does the data support this claim?_
+
+```{r}
+# TODO
+```
+
+TODO - your answer
+
+
+## 5 - Interaction Effects
+
+_In statistics, an __interaction effect__ is when two or more variables have a non additive effect in the value of some response.
+In the questions above, we explored the severity of COVID-19 (response) given variables age and medical condition.
+Do age and medical condition have an interaction effect in the severity of COVID-19?_
+
+```{r}
+# TODO hint: Use interaction.plot
+```
+
+TODO - your answer
+
+
+## 6 - Your Question
+
+_Come up with your own question about COVID-19, and answer it using this data set.
+You may want to explore other demographic columns: sex, and race / ethnicity.
+You could also look at how the number of cases have changed over time using the report dates._
+
+```{r}
+# TODO
+```
+
+TODO - Question and answer

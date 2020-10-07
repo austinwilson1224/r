@@ -30,17 +30,20 @@ If you do this, make sure you explain the meaning and rationale behind your choi
 _a) Describe this data set at a high level.
 What does each row represent?_
 
-TODO - your answer
+Each row represents a patient. 
 
-_b) How many rows and columns do you expect to see based on the website?
+_b) How many rows and columns do you expect to see based on the website? 
 Load the data into R.
-Is this reflected in the data?_
+Is this reflected in the data? 
 
 ```{r}
-# TODO: load data and look at dimensions
+covid_data = read.csv("COVID-19_Case_Surveillance_Public_Use_Data.csv")
+dim(covid_data)
 ```
 
-TODO - your answer
+- I don't see any information on the website about the data set dimensions. The size of the file is 462 MB so I would expect a large dataset, with thousands of rows and a couple columns. 
+
+- Yes. The data set has 4,481,062 rows and 11 columns. More than I anticipated. 
 
 
 ## 2 - Missing Data

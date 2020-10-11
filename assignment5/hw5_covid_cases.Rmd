@@ -39,6 +39,7 @@ Is this reflected in the data?
 ```{r}
 covid_data = read.csv("COVID-19_Case_Surveillance_Public_Use_Data.csv")
 dim(covid_data)
+row_count = dim(covid_data)[1]
 ```
 
 - I don't see any information on the website about the data set dimensions. The size of the file is 462 MB so I would expect a large dataset, with thousands of rows and a couple columns. 
@@ -53,10 +54,81 @@ Which columns have the highest proportion of missing data?
 Why might these be missing?_
 
 ```{r}
-# TODO
+# onsetdt missing values
+onsetdt_missing = sum(covid_data$onset_dt == "")
+
+# current status missing values
+unique(covid_data$current_status) # none
+
+# sex missing values
+unique(covid_data$sex)
+sex_unknown = sum(covid_data$sex == "Unknown", na.rm = TRUE)
+sex_missing = sum(covid_data$sex == "Missing", na.rm = TRUE)
+
+# colnames(covid_data)
+for (column in colnames(covid_data)) {
+  
+  # different values possible to count 
+  # "Missing"
+  missing = sum(covid_data[,column] == "Missing", na.rm = TRUE)
+
+  # unknown
+  unknown = sum(covid_data[,column] == "Unknown", na.rm = TRUE)
+
+  # "N/A"
+  na = sum(is.na(covid_data[,column]))
+
+  # blank or ""
+  blank = sum(covid_data[,column] == "", na.rm = TRUE)
+  
+  total = sum(missing,unknown,na,blank)
+  percent_missing = total / row_count
+  
+  
+  print(column)
+  print(total/row_count)
+}
+
+test = data.frame(colnames(covid_data))
+View(test)
+
+count_missing = function(data) {
+  row_count = dim(data)[1]
+  # df = data.frame()
+  for (column in colnames(data)) {
+    # df[,column]
+  
+    # different values possible to count 
+    # "Missing"
+    missing = sum(data[,column] == "Missing", na.rm = TRUE)
+  
+    # unknown
+    unknown = sum(data[,column] == "Unknown", na.rm = TRUE)
+  
+    # "N/A"
+    na = sum(is.na(data[,column]))
+  
+    # blank or ""
+    blank = sum(data[,column] == "", na.rm = TRUE)
+    
+    total = sum(missing,unknown,na,blank)
+    percent_missing = total / row_count
+    
+    
+    print(column)
+    print(total)
+    # print(total/row_count)
+  }
+  
+}
+
+count_missing(covid_data)
+
+
+
 ```
 
-TODO - your answer
+- icu_yn has the most values "Missing". These might be missing because they are unknown or the data was unavailable. 
 
 
 ## 3 - Age Risk
@@ -64,12 +136,13 @@ TODO - your answer
 _The [CDC states](https://www.cdc.gov/coronavirus/2019-ncov/need-extra-precautions/older-adults.html) "Among adults, the risk for severe illness from COVID-19 increases with age, with older adults at highest risk."
 Does the data support this claim?_
 
-_Hint 1: It might be useful to think about these COVID illness rates by age after adjusting     for the relative sizes of each age group in the country.
+_Hint 1: It might be useful to think about these COVID illness rates by age after adjusting for the relative sizes of each age group in the country.
 You'll need to bring in another data source to do this._
 
 
 ```{r}
 # TODO
+unique(covid_data$age_group)
 ```
 
 TODO - your answer

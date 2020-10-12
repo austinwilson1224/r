@@ -252,6 +252,16 @@ Do age and medical condition have an interaction effect in the severity of COVID
 
 ```{r}
 # TODO hint: Use interaction.plot
+boolean_mask = (covid_data$medcond_yn == "Yes" | covid_data$medcond_yn == "No" | !is.na(covid_data$medcond_yn)) & (covid_data$death_yn == "Yes" | covid_data$death_yn == "No") & (covid_data$age_group != "Unknown" | !is.na(covid_data$age_group))
+
+covid_data = covid_data[boolean_mask,]
+covid_data = covid_data[covid_data$age_group != "Unknown",]
+
+# table(covid_data$age_group)
+
+interaction.plot(covid_data$age_group, covid_data$medcond_yn,covid_data$death_yn == "Yes")
+
+
 ```
 
 TODO - your answer

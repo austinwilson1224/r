@@ -30,11 +30,38 @@ If you do this, make sure you explain the meaning and rationale behind your choi
 _a) Describe this data set at a high level.
 What does each row represent?_
 
-Each row represents a patient. 
+Each row represents a deidentified patient. 
+
+- cdc_report_dt represents initial case report date to CDC and is a Date & Time type. 
+
+- pos_spec_dt represents date of first positive specimen collection and is a Date & Time type. 
+
+- onset_dt represents symptom onset date, if symptomatic and is a Date & Time type. 
+
+- current_status is the case status: labrotory-confirmed case; probable case and is plain text
+
+- sex the is sex of the patient... This could be male, female, unknown, other and this is plain text. 
+
+- age_goup is the age category of the patient. This could be several different categories: 0-9 Years; 10-19 Years; 20-29 Years; 30-39 Years; 40-49 Years; 50-59 Years; 60-69 Years; 70-79 Years and 80+ years 
+
+- race and ethnicity (combined) represents the patients race and ethnicity. The categories are: Race and ethnicity (combined): Hispanic/Latino; American Indian / Alaska Native, Non-Hispanic; Asian, Non-Hispanic; Black, Non-Hispanic; Native Hawaiian / Other Pacific Islander, Non-Hispanic; White, Non-Hispanic; Multiple/Other, Non-Hispanic. This is plain text. 
+
+- hosp_yn is the patients hospitilization status. The columns ending with "yn" usually have "Yes" or "No" for their values. This is plain text.
+
+- icu_yn is the patients ICU admission status. This is plain text. 
+
+- death_yn represents weather or not the patient has died. This is stored in plain text values as "Yes" or "No". 
+
+- medcond_yn represents weather or not the patient has presence of underlying comordibidity or disease. This is stored in plain text. 
 
 _b) How many rows and columns do you expect to see based on the website? 
+
+- I expect this data to have 11 columns and 4,481,062 rows because that is what the documentation claims. 
+
 Load the data into R.
+
 Is this reflected in the data? 
+
 
 ```{r}
 covid_data = read.csv("COVID-19_Case_Surveillance_Public_Use_Data.csv")
@@ -42,7 +69,6 @@ dim(covid_data)
 row_count = dim(covid_data)[1]
 ```
 
-- I don't see any information on the website about the data set dimensions. The size of the file is 462 MB so I would expect a large dataset, with thousands of rows and a couple columns. 
 
 - Yes. The data set has 4,481,062 rows and 11 columns. More than I anticipated. 
 
@@ -155,7 +181,7 @@ severity_table = table(covid$age_group, covid$severity)
 plot(severity_table)
 ```
 
-
+This table shows that as age increases the proportion of people in the 1 and 3 categories increases and people in the 0 category decreases. We see that people who are not in the hospital are young. More people who are hospitalized or die are older. People in category 2 are uniformly small accross the board. 
 
 
 ```{r}

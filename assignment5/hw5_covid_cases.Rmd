@@ -55,42 +55,42 @@ Why might these be missing?_
 
 ```{r}
 # onsetdt missing values
-onsetdt_missing = sum(covid_data$onset_dt == "")
+# onsetdt_missing = sum(covid_data$onset_dt == "")
 
 # current status missing values
-unique(covid_data$current_status) # none
+# unique(covid_data$current_status) # none
 
-# sex missing values
-unique(covid_data$sex)
-sex_unknown = sum(covid_data$sex == "Unknown", na.rm = TRUE)
-sex_missing = sum(covid_data$sex == "Missing", na.rm = TRUE)
+# # sex missing values
+# unique(covid_data$sex)
+# sex_unknown = sum(covid_data$sex == "Unknown", na.rm = TRUE)
+# sex_missing = sum(covid_data$sex == "Missing", na.rm = TRUE)
 
 # colnames(covid_data)
-for (column in colnames(covid_data)) {
-  
-  # different values possible to count 
-  # "Missing"
-  missing = sum(covid_data[,column] == "Missing", na.rm = TRUE)
+# for (column in colnames(covid_data)) {
+#   
+#   # different values possible to count 
+#   # "Missing"
+#   missing = sum(covid_data[,column] == "Missing", na.rm = TRUE)
+# 
+#   # unknown
+#   unknown = sum(covid_data[,column] == "Unknown", na.rm = TRUE)
+# 
+#   # "N/A"
+#   na = sum(is.na(covid_data[,column]))
+# 
+#   # blank or ""
+#   blank = sum(covid_data[,column] == "", na.rm = TRUE)
+#   
+#   total = sum(missing,unknown,na,blank)
+#   percent_missing = total / row_count
+#   
+#   
+#   print(column)
+#   print(total/row_count)
+# }
 
-  # unknown
-  unknown = sum(covid_data[,column] == "Unknown", na.rm = TRUE)
-
-  # "N/A"
-  na = sum(is.na(covid_data[,column]))
-
-  # blank or ""
-  blank = sum(covid_data[,column] == "", na.rm = TRUE)
-  
-  total = sum(missing,unknown,na,blank)
-  percent_missing = total / row_count
-  
-  
-  print(column)
-  print(total/row_count)
-}
-
-test = data.frame(colnames(covid_data))
-View(test)
+# test = data.frame(colnames(covid_data))
+# View(test)
 
 count_missing = function(data) {
   row_count = dim(data)[1]
@@ -114,9 +114,10 @@ count_missing = function(data) {
     total = sum(missing,unknown,na,blank)
     percent_missing = total / row_count
     
-    
-    print(column)
-    print(total)
+    result = c(column, total, total/row_count)
+    print(result)
+    # print(column)
+    # print(total)
     # print(total/row_count)
   }
   
@@ -142,10 +143,55 @@ You'll need to bring in another data source to do this._
 
 ```{r}
 # TODO
-unique(covid_data$age_group)
+# unique(covid_data$age_group)
+
+
+
+
+young_boolean_mask = covid_data$age_group == "0 - 9 Years" | covid_data$age_group ==  "10 - 19 Years" | covid_data$age_group == "20 - 29 Years" 
+
+young = covid_data[young_boolean_mask,]
+
+young_dead = young[young$death_yn == "Yes",]
+# young_alive = young[young$death_yn == "No",]
+
+# checking to see the rate at which young people die
+dim(young_dead)[1] / dim(young)[1]
+
+
+
+mid_boolean_mask = covid_data$age_group == "30 - 39 Years" | covid_data$age_group == "30 - 39 Years" | covid_data$age_group == "40 - 49 Years"
+mid = covid_data[mid_boolean_mask,]
+mid_dead = mid[mid$death_yn == "Yes",]
+dim(mid_dead)[1] / dim(mid)[1]
+
+
+
+
+old_boolean_mask = covid_data$age_group == "50 - 59 Years" | covid_data$age_group == "60 - 69 Years" | covid_data$age_group == "70 - 79 Years" | covid_data$age_group == "80+ Years"
+old = covid_data[old_boolean_mask,]
+# dim(old)
+
+old_dead = old[old$death_yn == "Yes",]
+
+dim(old_dead)[1] / dim(old)[1]
+
+
+
+
+
+
+# exploring dimension of the data set
+# dim(young)[1] + dim(mid)[1] + dim(old)[1]
+# dim(covid_data)[1]
+
+# unique(covid_data$age_group)
+
+
 ```
 
-TODO - your answer
+
+TODO - The three values printed are in ascending order the death rates of young, middle aged and elder people. We can see that as age increases so does the death rate. 
 
 
 ## 4 - Medical Condition Risk
@@ -155,10 +201,47 @@ Does the data support this claim?_
 
 ```{r}
 # TODO
-# test
+# unique(covid_data$medcond_yn)
+boolean_mask_medcond_death = (covid_data$medcond_yn == "Yes" | covid_data$medcond_yn == "No") & (covid_data$death_yn == "Yes" | covid_data$death_yn == "No")
+medcond_alive_or_dead = covid_data[boolean_mask_medcond_death,]
+
+
+
+# unique(medcond_alive_or_dead$medcond_yn)
+# unique(medcond_alive_or_dead$death_yn)
+#  dim(medcond_alive_or_dead)
+
+has_cond_and_alive = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "Yes" & medcond_alive_or_dead$death_yn == "No"),]
+# dim(has_cond_and_alive) # 317,885 rows
+
+
+dim(has_cond_and_alive)[1] / dim(medcond_alive_or_dead)[1]
+
+
+has_cond_and_dead = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "Yes" & medcond_alive_or_dead$death_yn == "Yes"),]
+# dim(has_cond_and_dead) # 64,598
+
+dim(has_cond_and_dead)[1] / dim(medcond_alive_or_dead)[1]
+
+
+no_cond_and_alive = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "No" & medcond_alive_or_dead$death_yn == "No"),]
+# dim(no_cond_and_alive) # 292940 rows
+
+dim(no_cond_and_alive)[1] / dim(medcond_alive_or_dead)[1]
+
+
+no_cond_and_dead = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "No" & medcond_alive_or_dead$death_yn == "Yes"),]
+# dim(no_cond_and_dead) # 2,257 rows
+
+
+dim(no_cond_and_dead)[1] / dim(medcond_alive_or_dead)[1]
+
+
+
+
 ```
 
-TODO - your answer
+I subsetted the data so that I only have entries that contain data on medical condition and weather or not  they died. We  can see  that more people who have a medical condition die. 
 
 
 ## 5 - Interaction Effects

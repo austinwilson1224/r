@@ -54,66 +54,22 @@ Which columns have the highest proportion of missing data?
 Why might these be missing?_
 
 ```{r}
-# onsetdt missing values
-# onsetdt_missing = sum(covid_data$onset_dt == "")
 
-# current status missing values
-# unique(covid_data$current_status) # none
 
-# # sex missing values
-# unique(covid_data$sex)
-# sex_unknown = sum(covid_data$sex == "Unknown", na.rm = TRUE)
-# sex_missing = sum(covid_data$sex == "Missing", na.rm = TRUE)
-
-# colnames(covid_data)
-# for (column in colnames(covid_data)) {
-#   
-#   # different values possible to count 
-#   # "Missing"
-#   missing = sum(covid_data[,column] == "Missing", na.rm = TRUE)
-# 
-#   # unknown
-#   unknown = sum(covid_data[,column] == "Unknown", na.rm = TRUE)
-# 
-#   # "N/A"
-#   na = sum(is.na(covid_data[,column]))
-# 
-#   # blank or ""
-#   blank = sum(covid_data[,column] == "", na.rm = TRUE)
-#   
-#   total = sum(missing,unknown,na,blank)
-#   percent_missing = total / row_count
-#   
-#   
-#   print(column)
-#   print(total/row_count)
-# }
-
-# test = data.frame(colnames(covid_data))
-# View(test)
-
+# sex missing values
 count_missing = function(data) {
   row_count = dim(data)[1]
-  # df = data.frame()
   for (column in colnames(data)) {
-    # df[,column]
-  
-    # different values possible to count 
     # "Missing"
     missing = sum(data[,column] == "Missing", na.rm = TRUE)
-  
     # unknown
     unknown = sum(data[,column] == "Unknown", na.rm = TRUE)
-  
     # "N/A"
     na = sum(is.na(data[,column]))
-  
     # blank or ""
     blank = sum(data[,column] == "", na.rm = TRUE)
-    
     total = sum(missing,unknown,na,blank)
     percent_missing = total / row_count
-    
     result = c(column, total, total/row_count)
     print(result)
     # print(column)
@@ -124,12 +80,12 @@ count_missing = function(data) {
 }
 
 count_missing(covid_data)
-
+# should have used lapply 
 
 
 ```
 
-- icu_yn has the most values "Missing". These might be missing because they are unknown or the data was unavailable. 
+- icu_yn has the most values "Missing", "Unknown" blank or NA. medcond_yn has the second most missing values. pos_spec_dt is the third.  These might be missing because they are unknown or the data was unavailable. There is also probably a lot of missing data because the situation is hectic. Doctors may not have time to record this data. If a patient is feeling well they may leave unexpectedly. 
 
 
 ## 3 - Age Risk
@@ -142,25 +98,81 @@ You'll need to bring in another data source to do this._
 
 
 ```{r}
+# from the notes
+covid = read.csv("COVID-19_Case_Surveillance_Public_Use_Data.csv")
+
+severity = rep(0, times = nrow(covid))
+severity[covid$hosp_yn == "Yes"] = 1
+severity[covid$icu_yn == "Yes"] = 2
+severity[covid$death_yn == "Yes"] = 3
+
+covid$severity = severity
+
+
+# young 
+young_adults = covid[(covid$age_group == "20 - 29 Years" | covid$age_group == "30 - 39 Years"),]
+
+# dim(young_adults)
+print("Young adults:")
+dim(young_adults[young_adults$severity == 0,])[1] / dim(young_adults)[1]
+dim(young_adults[young_adults$severity == 1,])[1] / dim(young_adults)[1]
+dim(young_adults[young_adults$severity == 2,])[1] / dim(young_adults)[1]
+dim(young_adults[young_adults$severity == 3,])[1] / dim(young_adults)[1]
+
+
+
+# middle aged adults
+middle_adults = covid[(covid$age_group == "40 - 49 Years" | covid$age_group == "50 - 59 Years"),]
+# dim(middle_adults)
+print("middle adults")
+dim(middle_adults[middle_adults$severity == 0,])[1] / dim(middle_adults)[1]
+dim(middle_adults[middle_adults$severity == 1,])[1] / dim(middle_adults)[1]
+dim(middle_adults[middle_adults$severity == 2,])[1] / dim(middle_adults)[1]
+dim(middle_adults[middle_adults$severity == 3,])[1] / dim(middle_adults)[1]
+
+# elderly 
+elder_adults = covid[(covid_data$age_group == "60 - 69 Years" | covid_data$age_group == "70 - 79 Years" | covid_data$age_group == "80+ Years"),]
+dim(elder_adults)
+print("elder adults")
+dim(elder_adults[elder_adults$severity == 0,])[1] / dim(elder_adults)[1]
+dim(elder_adults[elder_adults$severity == 1,])[1] / dim(elder_adults)[1]
+dim(elder_adults[elder_adults$severity == 2,])[1] / dim(elder_adults)[1]
+dim(elder_adults[elder_adults$severity == 3,])[1] / dim(elder_adults)[1]
+
+
+
+
+```
+
+
+This data shows that as age trends upward people in category 0 trends downward and people in category 3 trend upward. The claim that the risk for severe illness increases with age. 
+
+
+
+```{r}
+covid = covid[covid$age_group != "Unknown",]
+severity_table = table(covid$age_group, covid$severity)
+plot(severity_table)
+```
+
+
+
+
+```{r}
 # TODO
 # unique(covid_data$age_group)
 
 
 
 
-young_boolean_mask = covid_data$age_group == "0 - 9 Years" | covid_data$age_group ==  "10 - 19 Years" | covid_data$age_group == "20 - 29 Years" 
-
+young_boolean_mask = covid_data$age_group == "0 - 9 Years" | covid_data$age_group ==  "10 - 19 Years" 
 young = covid_data[young_boolean_mask,]
-
 young_dead = young[young$death_yn == "Yes",]
-# young_alive = young[young$death_yn == "No",]
-
-# checking to see the rate at which young people die
 dim(young_dead)[1] / dim(young)[1]
 
 
 
-mid_boolean_mask = covid_data$age_group == "30 - 39 Years" | covid_data$age_group == "30 - 39 Years" | covid_data$age_group == "40 - 49 Years"
+mid_boolean_mask = covid_data$age_group == "20 - 29 Years" | covid_data$age_group == "30 - 39 Years" | covid_data$age_group == "30 - 39 Years" | covid_data$age_group == "40 - 49 Years"
 mid = covid_data[mid_boolean_mask,]
 mid_dead = mid[mid$death_yn == "Yes",]
 dim(mid_dead)[1] / dim(mid)[1]
@@ -170,7 +182,7 @@ dim(mid_dead)[1] / dim(mid)[1]
 
 old_boolean_mask = covid_data$age_group == "50 - 59 Years" | covid_data$age_group == "60 - 69 Years" | covid_data$age_group == "70 - 79 Years" | covid_data$age_group == "80+ Years"
 old = covid_data[old_boolean_mask,]
-# dim(old)
+
 
 old_dead = old[old$death_yn == "Yes",]
 
@@ -178,20 +190,16 @@ dim(old_dead)[1] / dim(old)[1]
 
 
 
-
-
-
-# exploring dimension of the data set
-# dim(young)[1] + dim(mid)[1] + dim(old)[1]
-# dim(covid_data)[1]
-
-# unique(covid_data$age_group)
-
-
 ```
 
 
-TODO - The three values printed are in ascending order the death rates of young, middle aged and elder people. We can see that as age increases so does the death rate. 
+The three values printed are death rates of young, middle aged and elder people, respectively. We can see that as age increases so does the death rate. Therefore this data supports the claim that 
+
+
+
+
+
+
 
 
 ## 4 - Medical Condition Risk
@@ -205,43 +213,44 @@ Does the data support this claim?_
 boolean_mask_medcond_death = (covid_data$medcond_yn == "Yes" | covid_data$medcond_yn == "No") & (covid_data$death_yn == "Yes" | covid_data$death_yn == "No")
 medcond_alive_or_dead = covid_data[boolean_mask_medcond_death,]
 
+dim(medcond_alive_or_dead)
 
 
-# unique(medcond_alive_or_dead$medcond_yn)
-# unique(medcond_alive_or_dead$death_yn)
-#  dim(medcond_alive_or_dead)
 
+
+# has medical condition and is alive
 has_cond_and_alive = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "Yes" & medcond_alive_or_dead$death_yn == "No"),]
-# dim(has_cond_and_alive) # 317,885 rows
-
-
+print("percent of people with medical condition who survived")
 dim(has_cond_and_alive)[1] / dim(medcond_alive_or_dead)[1]
 
 
+# has medical condition and is dead
 has_cond_and_dead = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "Yes" & medcond_alive_or_dead$death_yn == "Yes"),]
-# dim(has_cond_and_dead) # 64,598
-
+print("percent of people with medical condition who died")
 dim(has_cond_and_dead)[1] / dim(medcond_alive_or_dead)[1]
 
 
+# does not have medical condition and is alive
 no_cond_and_alive = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "No" & medcond_alive_or_dead$death_yn == "No"),]
-# dim(no_cond_and_alive) # 292940 rows
-
+print("percent of people with NO medical condition who survived")
 dim(no_cond_and_alive)[1] / dim(medcond_alive_or_dead)[1]
 
-
+# does not have medical condition and died
 no_cond_and_dead = medcond_alive_or_dead[(medcond_alive_or_dead$medcond_yn == "No" & medcond_alive_or_dead$death_yn == "Yes"),]
-# dim(no_cond_and_dead) # 2,257 rows
-
-
+print("percent of people with NO medical condition who died")
 dim(no_cond_and_dead)[1] / dim(medcond_alive_or_dead)[1]
 
+# med_cond_table = table(medcond_alive_or_dead$medcond_yn,medcond_alive_or_dead$death_yn)
+covid4 = covid[(covid$medcond_yn == "Yes" | covid$medcond_yn == "No"),]
+med_cond_table = table(covid4$medcond_yn,covid4$severity)
 
-
+plot(med_cond_table, xlab = "medical condition", ylab = "death")
 
 ```
 
-I subsetted the data so that I only have entries that contain data on medical condition and weather or not  they died. We  can see  that more people who have a medical condition die. 
+I subsetted the data so that I only have entries that contain data on medical condition and weather or not  they died. We  can see  that more people who have a medical condition die. Because the numbers in this data seem a little of I created a table and plotted it just to be sure. From the plot of the table I can see that the people with medical conditions much more often fall into categories 1,2 and 3 than people without a medical condition. This supports the claim people with medical conditions are at higher risk. It is worthwhile to mention that this may be biased. People with medical conditions are more likely to check themselves into the hospital. 
+
+
 
 
 ## 5 - Interaction Effects
@@ -251,30 +260,61 @@ In the questions above, we explored the severity of COVID-19 (response) given va
 Do age and medical condition have an interaction effect in the severity of COVID-19?_
 
 ```{r}
-# TODO hint: Use interaction.plot
-boolean_mask = (covid_data$medcond_yn == "Yes" | covid_data$medcond_yn == "No" | !is.na(covid_data$medcond_yn)) & (covid_data$death_yn == "Yes" | covid_data$death_yn == "No") & (covid_data$age_group != "Unknown" | !is.na(covid_data$age_group))
-
-covid_data = covid_data[boolean_mask,]
-covid_data = covid_data[covid_data$age_group != "Unknown",]
-
-# table(covid_data$age_group)
-
-interaction.plot(covid_data$age_group, covid_data$medcond_yn,covid_data$death_yn == "Yes")
-
-
+covid5 = covid[(covid$medcond_yn == "Yes" | covid$medcond_yn == "No"),]
+interaction.plot(covid5$age_group, covid5$medcond_yn,covid5$death_yn == "Yes", xlab = "age", ylab = "mean death", trace.label = "medical condition", col =  c("green", "red"))
 ```
 
-TODO - your answer
+
+
+Yes age and medical condition have an effect on severity of covid-19. We can see that as age increases deaths increase. We can also see that in every age category someone with with a medical condition is more likely to die. 
 
 
 ## 6 - Your Question
 
 _Come up with your own question about COVID-19, and answer it using this data set.
-You may want to explore other demographic columns: sex, and race / ethnicity.
-You could also look at how the number of cases have changed over time using the report dates._
+Does sex or race (white/non-white for simplicity) have any effect on the death of people. 
 
 ```{r}
-# TODO
+mask6 = (covid_data$sex == "Male" | covid_data$sex == "Female") & (covid_data$death_yn == "Yes" | covid_data$death_yn == "No")
+covid6 = covid_data[mask6,]
+covid_differences_in_sex = table(covid6$sex, covid6$death_yn)
+plot(covid_differences_in_sex)
 ```
 
-TODO - Question and answer
+We can see from this plot that there is no difference, or very little difference in death rates between women and men. 
+
+```{r}
+# race 
+covid_data$white = covid_data$Race.and.ethnicity..combined. == "White, Non-Hispanic"
+covid_differences_in_race = table(covid_data$white, covid_data$death_yn)
+plot(covid_differences_in_race)
+
+
+
+unique(covid_data$Race.and.ethnicity..combined.)
+```
+
+It appears that covid is not racist, and covid does not affect people different if they are white or not. 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

@@ -1,0 +1,103 @@
+---
+title: Roulette
+date: 18 October 2020
+---
+
+#### Outcomes
+
+- Define custom functions
+- Split, apply, and combine data
+- Analyze long term simulation results
+
+
+#### Instructions
+
+- Answer the following questions, and show all your R code.
+- Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+
+You can use the functions we've developed in class for this assignment.
+
+```{r}
+source("https://raw.githubusercontent.com/clarkfitzg/stat128/master/roulette.R")
+```
+
+You may also find it helpful to borrow [code from lecture](https://github.com/clarkfitzg/stat128/blob/master/2020-10-12.Rmd).
+
+
+# Questions
+
+## 1 - A fancy function
+
+_The goal of statistical simulations is to understand the properties and general patterns in random objects.
+One way to uncover these patterns is to do many simulations, until the trend lines in the plots become obvious._
+
+_Write a function to produce a detailed plot similar to the [plot displayed in class](https://github.com/clarkfitzg/stat128/blob/master/long_term_roulette.png) on Monday, October 12th.
+Include the following features:_
+
+- visually important line for median winnings at each time point
+- dashed line for 0.05 and 0.95 quantiles of the winning at each time point
+- several semitransparent lines (set `alpha < 1`) representing actual simulated sequences of winnings for players
+- informative labels, title, and caption
+
+_The function should return a ggplot object, and accept at least the following arguments:_
+
+- `strategy`, defaulting to `simple_strategy(even)`, or one of the other 1:1 betting strategies
+- `quants`, defaulting to 0.9, to denote the proportion of the data between the dashed lines
+- `nplayers`, with a default large enough to get reasonably smooth looking dashed quantile lines with the default strategy
+- `nplayers_plot`, defaulting to 10, number of semitransparent lines to plot
+- `ntimes`, with a default sufficiently large to see where the 0.95 quantile intersects 0 with the default strategy
+- `print`, defaulting to `TRUE`, whether to print the final plot
+
+_Hint: I suggest you write at least two other functions, one to compute the summary statistics at each time point, and one to do all the plotting based on the simulated data._
+
+```{r}
+# TODO
+```
+
+_Call your function with all the defaults, to make sure it works._
+
+```{r}
+# TODO
+```
+
+## 2 - Analysis
+
+Use the function you wrote above to answer the following questions.
+
+_1. What happens when we increase the number of players?_
+
+```{r}
+# TODO show difference when increase players
+```
+
+TODO explain
+
+_2. Approximately how many times do you need to play before 95% of players have lost money? Explain this result to a person who thinks they can make money gambling._
+
+TODO explain
+
+_3. What happens when you use a betting strategy that does not have a 1 to 1 payout?_
+
+```{r}
+# TODO
+```
+
+TODO explain
+
+
+## 3 - Martingale Fails
+
+_Pick your favorite casino and find out the minimum and maximum bet for a Euro roulette table from [Online United States Casino](https://www.onlineunitedstatescasinos.com/las-vegas/games/roulette/).
+Suppose you have 5,000 dollars to spend on gambling, and once you lose that, you cannot play more.
+Given these numbers, use a large number of simulations to answer ONE of the following questions relating to the martingale (doubling) betting strategy with a 1 to 1 payout._
+
+1. On average, how long can you play before going bankrupt?
+2. Does the martingale strategy let you play longer than the simple strategies above?
+3. Suppose a dealer spins the roulette wheel once a minute.
+  If you go to Las Vegas to play for a weekend, what's the probability you will lose all your money?
+  
+```{r}
+# TODO
+```
+
+TODO explain

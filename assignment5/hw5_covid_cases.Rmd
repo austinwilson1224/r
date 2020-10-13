@@ -301,7 +301,7 @@ _Come up with your own question about COVID-19, and answer it using this data se
 Does sex or race (white/non-white for simplicity) have any effect on the death of people. 
 
 ```{r}
-mask6 = (covid_data$sex == "Male" | covid_data$sex == "Female") & (covid_data$death_yn == "Yes" | covid_data$death_yn == "No")
+mask6 = (covid_data$sex == "Male" | covid_data$sex == "Female" | covid_data$sex == "Other") & (covid_data$death_yn == "Yes" | covid_data$death_yn == "No")
 covid6 = covid_data[mask6,]
 covid_differences_in_sex = table(covid6$sex, covid6$death_yn)
 plot(covid_differences_in_sex)

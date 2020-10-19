@@ -76,6 +76,7 @@ summary_at_time = function(ds)
     w = ds$winnings
     data.frame(time, sample_mean = mean(w), sample_sd = sd(w))
 }
+# d = data.frame(d)
 ds = split(d, d$time)
 dq = lapply(ds, summary_at_time)
 dtheory = do.call(rbind, dq)

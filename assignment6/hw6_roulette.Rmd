@@ -51,78 +51,78 @@ _The function should return a ggplot object, and accept at least the following a
 _Hint: I suggest you write at least two other functions, one to compute the summary statistics at each time point, and one to do all the plotting based on the simulated data._
 
 ```{r}
+straightup = function(x, d = 1)
+{
+    ifelse(x == d, 35, -1)
+}
 set.seed(1380)
 NTIMES = 10000L
 NPLAYERS = 500L
 d = play(strategy = simple_strategy(even), nplayers = NPLAYERS, ntimes = NTIMES)
 
-fancy = function(strategy = simple_strategy(even), quants = .9, nplayers = 10, nplayers_plot = 10, ntimes = 100, print = TRUE) {
-  # insert trash here ....
-  d = data.frame(play(strategy = strategy, nplayers = nplayers, ntimes = ntimes))
-  # d$time =  seq(ntimes)
-  time = seq(ntimes)
-  # g = ggplot()
-  g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
-  g = g + geom_line(aes(time, X1), data = d, alpha=.2)
-  # plot(g)
-  
-  for(x in colnames(d)) {
-    print(x)
-    g = g + geom_line(aes(time, d[,x]), alpha=.2)
-  }
-  
-  plot(g)
-  
+mean_theory = function(time){
+    pwin = 18 / 37
+    m1 = -1 * (1 - pwin) + 1 * pwin
+    time * m1
 }
-fancy(,ntimes = 1000)
+sd_theory = function(time){
+    pwin = 18 / 37
+    mx2 = (-1)^2 * (1 - pwin) + 1^2 * pwin
+    v1 = mx2 - mean_theory(1)^2
+    v = time * v1
+    sqrt(v)
+}
+#' Compute summary statistics for a particular time
+#'
+#' @param ds data frame containing columns: `winnings`, `time` where all times are the same
+#' @return data frame containing 1 row with columns: `time`, `sample_mean`, `sample_sd`
+summary_at_time = function(ds)
+{
+    time = ds$time[1]
+    w = ds$winnings
+    data.frame(time, sample_mean = mean(w), sample_sd = sd(w), median = median(w))
+}
 
-
-
-
-
-
-
-
-
-
+fancy = function(strategy = simple_strategy(even), quants = .9, nplayers = 5, nplayers_plot = 1, ntimes = 10000, print = TRUE, caption = "Simulated winnings over time for  many roulette players betting one dollar on evens every time.") {
+  d = play(strategy = strategy, nplayers = nplayers, ntimes = ntimes)
+  ds = split(d, d$time)
+  dq = lapply(ds, summary_at_time)
+  dtheory = do.call(rbind, dq)
+  dtheory$pop_mean = mean_theory(dtheory$time)
+  dtheory$pop_sd = sd_theory(dtheory$time)
+  z_score = qnorm(quants)
+  dtheory$lower = with(dtheory, sample_mean - z_score * sample_sd)
+  dtheory$upper = with(dtheory, sample_mean + z_score * sample_sd)
+  example_lines = d[d$player <= nplayers_plot, ]
+  library(ggplot2)
+  sample_color = "red"
+  pop_color = "blue"
+  g = ggplot(data = dtheory) +
+    geom_line(data = example_lines, mapping = aes(x = time, y = winnings, group = player), alpha = 0.1, size = 0.3) +
+    geom_line(mapping = aes(x = time, y = sample_mean), color = sample_color) + 
+    # geom_line(mapping = aes(x = time, y = pop_mean), color = pop_color) +
+    geom_line(mapping = aes(x = time, y = lower)) + 
+    geom_line(mapping = aes(x = time, y = upper)) +
+    geom_line(mapping = aes(x = time, y = median), color = "cornflower blue", alpha = .5) + 
+    labs(title = "many games of roulette and many players", caption = caption)
+  if(print) {
+    print(g)
+  }
+  g
+}
 ```
 
 _Call your function with all the defaults, to make sure it works._
 
+
+
+
 ```{r}
-test = fancy()
-plot(test)
-# plot(test)
-plot(test$X1, type = "l")
-test$row_means = rowMeans(test)
-plot(test$row_means, type="l")
-test$row_medians = apply(test, 1, median)
-
-
-
-
-test$one = apply(test[,1:10], 1, quantile, probs = c(.1))
-test$ninety = apply(test[,1:10], 1, quantile, probs = c(.9))
-
-quantile(test,probs = c(1))
-
-
-quantile(test[1,1:10], probs = c(.1))
-quantile(test[1,1:10], probs = c(.9))
-
-
-apply()
-
-
-
-
-
-
-
-test[,1:10]
-
-test$nintey = apply(test, 1, quantile(c(1)))
+fancy_trash = fancy()
 ```
+
+
+
 
 ## 2 - Analysis
 
@@ -130,38 +130,130 @@ Use the function you wrote above to answer the following questions.
 
 _1. What happens when we increase the number of players?_
 
+
 ```{r}
-# TODO show difference when increase players
+question2 = fancy(nplayers = 200, quants = .95)
 ```
 
-TODO explain
+We can see that the lines are much smoother for the upper bound, lower bound, median and mean. We can see that the standard deviation seems to increase a little bit, but not much. This does not make sense because of the law of large numbers. Also the median and mean are much closer together for the entire plot, where with less players we see some divergence between the mean and median. There is less volatility in the summary statistic graphs. 
+
+```{r}
+question2_2 = fancy(nplayers = 200, ntimes = 5000, quants = .95, nplayers_plot = 0)
+
+```
+
 
 _2. Approximately how many times do you need to play before 95% of players have lost money? Explain this result to a person who thinks they can make money gambling._
 
-TODO explain
+It looks like 95% of players have lost their money after 3,500 bets. This means that 95% of gamblers have lost all the money they bet in the entire span of their "career". 
 
 _3. What happens when you use a betting strategy that does not have a 1 to 1 payout?_
 
 ```{r}
-# TODO
+question2_3 = fancy(nplayers = 200, ntimes = 5000, quants = .95, nplayers_plot = 0, strategy = simple_strategy(straightup), caption = "straight up strategy")
 ```
 
-TODO explain
+I used the straightup simple strategy. From the graph it looks like there is much more variance in the data. People win big, but people also lose big. Over time the mean is decreasing. On average, this is a losing strategy. The 95 percentile is trending upwards, but in the even strategy it trends downwards over time. 
 
 
 ## 3 - Martingale Fails
 
 _Pick your favorite casino and find out the minimum and maximum bet for a Euro roulette table from [Online United States Casino](https://www.onlineunitedstatescasinos.com/las-vegas/games/roulette/).
 Suppose you have 5,000 dollars to spend on gambling, and once you lose that, you cannot play more.
-Given these numbers, use a large number of simulations to answer ONE of the following questions relating to the martingale (doubling) betting strategy with a 1 to 1 payout._
+Given these numbers, use a large number of simulations to answer ONE of the following questions relating to the martingale (doubling) betting strategy with a 1 to 1 payout. 
+
+- I picked Mandalay Bay because its the only casino I have been to... The minimum bet is \$15 and the maximum is \$500. 
 
 1. On average, how long can you play before going bankrupt?
 2. Does the martingale strategy let you play longer than the simple strategies above?
 3. Suppose a dealer spins the roulette wheel once a minute.
   If you go to Las Vegas to play for a weekend, what's the probability you will lose all your money?
   
+  
 ```{r}
-# TODO
+double_bet_mandalay_bay = function(x, initialbet = 15, bet = even)
+{
+    winnings = rep(NA, length(x))
+    betsize = initialbet
+    current_winnings = 0
+    for(i in seq_along(x)){
+      
+        # A NOTE TO THE GRADER -- this section of the code will prevent someone from gambling more money than they have. I commented this 
+        # if(current_winnings - betsize < -5000) {
+        #   betsize = 0
+        #   winnings[i] = current_winnings
+        #   # next
+        #   break
+        #   # print("you're broke")
+        # }
+      
+        if(bet(x[i]) == 1){
+            current_winnings = current_winnings + betsize
+            betsize = initialbet
+        } else {
+            current_winnings = current_winnings - betsize
+            if(betsize * 2 <= 500) {
+              betsize = 2 * betsize
+            }
+            else {
+              betsize = 500
+            }
+        }
+        winnings[i] = current_winnings
+        # print(winnings[i])
+    }
+    winnings
+}
+
 ```
 
-TODO explain
+
+  
+```{r}
+question3_2 = fancy(nplayers = 100, ntimes = 4000, quants = .95, nplayers_plot = 0, strategy = double_bet_mandalay_bay, caption = "martingale fail")
+```
+ 
+ - 1. It will take about about 3,500 bets to lose all of your money on average. I have rewritten the function to make the degenerate gambler stop betting after they lost their money, although I have commented this part out. I will show a similar graph below. 
+ 
+
+
+```{r}
+double_bet_mandalay_bay = function(x, initialbet = 15, bet = even)
+{
+    winnings = rep(NA, length(x))
+    betsize = initialbet
+    current_winnings = 0
+    for(i in seq_along(x)){
+      
+        # A NOTE TO THE GRADER -- this section of the code will prevent someone from gambling more money than they have. I commented this 
+        if(current_winnings - betsize < -5000) {
+          betsize = 0
+          winnings[i] = current_winnings
+          next
+        }
+        if(bet(x[i]) == 1){
+            current_winnings = current_winnings + betsize
+            betsize = initialbet
+        } else {
+            current_winnings = current_winnings - betsize
+            if(betsize * 2 <= 500) {
+              betsize = 2 * betsize
+            }
+            else {
+              betsize = 500
+            }
+        }
+        winnings[i] = current_winnings
+    }
+    winnings
+}
+question3_2 = fancy(nplayers = 100, ntimes = 4000, quants = .95, nplayers_plot = 0, strategy = double_bet_mandalay_bay, caption = "martingale fail")
+```
+
+ 
+ 
+ 
+ 
+ 
+ 
+ 

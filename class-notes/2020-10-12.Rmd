@@ -1,0 +1,235 @@
+- Evaluate code using `source`
+- Plan and implement functions
+- Document functions
+
+Announcements:
+
+- Voting
+- Good job on the COVID assignment.
+
+123 GO - Your word of the day
+
+## `source`
+
+How to load a package:
+
+```{r}
+library(ggplot2)
+```
+
+Roulette
+
+```{r}
+ls() # list objects
+```
+
+123 GO - Where did the file below come from?
+Local on my computer, or somewhere else?
+
+```{r}
+# Remote
+source("https://raw.githubusercontent.com/clarkfitzg/stat128/master/roulette.R")
+# Local file
+source("~/projects/stat128/roulette.R")
+```
+
+Q: Does running code you find online seem dangerous?
+Yes. You need to trust code before you use `source`.
+
+
+## DRY
+
+DRY: "Don't Repeat Yourself"
+
+
+## Motivation
+
+
+```{r}
+set.seed(1380)
+NTIMES = 10000L
+NPLAYERS = 500L
+d = play(simple_strategy(even), nplayers = NPLAYERS, ntimes = NTIMES)
+```
+
+
+```{r}
+mean_theory = function(time){
+    pwin = 18 / 37
+    m1 = -1 * (1 - pwin) + 1 * pwin
+    time * m1
+}
+sd_theory = function(time){
+    pwin = 18 / 37
+    mx2 = (-1)^2 * (1 - pwin) + 1^2 * pwin
+    v1 = mx2 - mean_theory(1)^2
+    v = time * v1
+    sqrt(v)
+}
+#' Compute summary statistics for a particular time
+#'
+#' @param ds data frame containing columns: `winnings`, `time` where all times are the same
+#' @return data frame containing 1 row with columns: `time`, `sample_mean`, `sample_sd`
+summary_at_time = function(ds)
+{
+    time = ds$time[1]
+    w = ds$winnings
+    data.frame(time, sample_mean = mean(w), sample_sd = sd(w))
+}
+ds = split(d, d$time)
+dq = lapply(ds, summary_at_time)
+dtheory = do.call(rbind, dq)
+dtheory$pop_mean = mean_theory(dtheory$time)
+dtheory$pop_sd = sd_theory(dtheory$time)
+dtheory$lower = with(dtheory, sample_mean - 2 * sample_sd)
+dtheory$upper = with(dtheory, sample_mean + 2 * sample_sd)
+NEXAMPLES = 30L
+example_lines = d[d$player <= NEXAMPLES, ]
+library(ggplot2)
+sample_color = "red"
+pop_color = "blue"
+conf_line = 2
+g = ggplot(data = dtheory) +
+    geom_line(data = example_lines, mapping = aes(x = time, y = winnings, group = player), alpha = 0.1, size = 0.3) +
+    geom_line(mapping = aes(x = time, y = sample_mean), color = sample_color) + 
+    geom_line(mapping = aes(x = time, y = pop_mean), color = pop_color) +
+    geom_line(mapping = aes(x = time, y = lower), linetype = conf_line) + 
+    geom_line(mapping = aes(x = time, y = upper), linetype = conf_line)
+print(g)
+```
+
+## Group Activity - Planning computations
+
+We want to make the plot above, starting with a data frame like `d`.
+
+Side note- there might be easier ways using builtin ggplot2 functions, and that's OK.
+The point of this exercise is for you to be able to do any calculation to produce any kind of data you like.
+If you can do this, then you can do anything :)
+
+Questions (8 minutes)
+
+1. What kind of object do we need to plot the lines for the mean +- 2*sd at each time point?
+
+Data frame that with columns `mean`, `sd`, `time`
+
+2. What steps do we need to take to produce such an object?
+
+Create a function to calculate the mean winnings at every time point.
+
+Hint: Be specific.
+Think about a data frame that will work well with ggplot2
+
+
+## Designing functions
+
+Here are some general steps to follow when writing a function.
+Order doesn't matter much, as long as you wait until the end to implement it.
+
+1. Decompose large problems into smaller problems.
+2. Decide what the inputs and outputs should be.
+3. Create the function __signature__, the name of the function and all the inputs.
+4. Have a test case ready, so you can check for correctness.
+    TDD- Test driven development.
+5. Implement the function.
+
+
+1. Decompose large problems into smaller problems.
+
+Big problem- compute summary statistics for all times.
+Smaller problem- compute summary statistics for ONLY ONE time.
+
+```{r}
+dt1k = d[d$time == 1000, ]
+```
+
+
+2. Decide what the inputs and outputs should be.
+
+input: dt data frame with only one distinct time value
+output: data frame with one row containing columns mean, sd, and time
+
+3. Create the function __signature__, the name of the function and all the inputs.
+
+```{r}
+#' Returns several summary statistics at a particular time
+#'
+#' @param dt data frame with only one distinct time value
+#' @return output: data frame with one row containing columns mean, sd, and time
+summary_at_time = function(dt)
+{
+}
+```
+
+4. Have a test case ready, so you can check for correctness.
+    TDD- Test driven development.
+    
+```{r}
+mean(dt1k$winnings)
+sd(dt1k$winnings)
+expected = data.frame(time = 1000, mean = -27.652, sd = 31.338)
+```
+
+5. Implement the function.
+
+```{r}
+#' Returns several summary statistics at a particular time
+#'
+#' @param dt data frame with only one distinct time value
+#' @return output: data frame with one row containing columns mean, sd, and time
+summary_at_time = function(dt)
+{
+    time = unique(dt$time)
+    data.frame(time, mean = mean(dt$winnings), sd = sd(dt$winnings))
+}
+```
+
+
+```{r}
+summary_at_time(dt1k)
+```
+
+```{r}
+summary_at_time2 = function(dt, col = "winnings")
+{
+    time = unique(dt$time)
+    col_of_interest = dt[, col]
+    data.frame(time, mean = mean(col_of_interest), sd = sd(col_of_interest))
+}
+summary_at_time2(dt1k)
+```
+
+
+
+```{r}
+# Make sure it really only has 1 time in there!
+summary_at_time3 = function(dt, col = "winnings")
+{
+    time = unique(dt$time)
+    if(length(time) != 1L){
+        stop("Require exactly 1 time value")
+    }
+    col_of_interest = dt[, col]
+    data.frame(time, mean = mean(col_of_interest), sd = sd(col_of_interest))
+}
+summary_at_time3(dt1k)
+bad_dt = dt1k
+bad_dt$time[1] = 1001
+summary_at_time3(bad_dt)
+```
+
+
+
+```{r}
+covid = read.csv("~/data/COVID-19_Case_Surveillance_Public_Use_Data.csv")
+```
+
+
+```{r}
+sexmfo = covid$sex %in% c("Female", "Male", "Other")
+covid2 = covid[sexmfo, ]
+covid2 = covid[covid$sex %in% c("Female", "Male", "Other"), ]
+table(covid2$sex)
+# with(covid[sexmfo, ],
+#      interaction.plot(...)
+# )
+```

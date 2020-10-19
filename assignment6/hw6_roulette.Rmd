@@ -51,13 +51,77 @@ _The function should return a ggplot object, and accept at least the following a
 _Hint: I suggest you write at least two other functions, one to compute the summary statistics at each time point, and one to do all the plotting based on the simulated data._
 
 ```{r}
-# TODO
+set.seed(1380)
+NTIMES = 10000L
+NPLAYERS = 500L
+d = play(strategy = simple_strategy(even), nplayers = NPLAYERS, ntimes = NTIMES)
+
+fancy = function(strategy = simple_strategy(even), quants = .9, nplayers = 10, nplayers_plot = 10, ntimes = 100, print = TRUE) {
+  # insert trash here ....
+  d = data.frame(play(strategy = strategy, nplayers = nplayers, ntimes = ntimes))
+  # d$time =  seq(ntimes)
+  time = seq(ntimes)
+  # g = ggplot()
+  g = ggplot() + labs(title = "Single game of roulette", caption = "Simulated winnings over time for a single roulette player betting one dollar on evens every time.")
+  g = g + geom_line(aes(time, X1), data = d, alpha=.2)
+  # plot(g)
+  
+  for(x in colnames(d)) {
+    print(x)
+    g = g + geom_line(aes(time, d[,x]), alpha=.2)
+  }
+  
+  plot(g)
+  
+}
+fancy(,ntimes = 1000)
+
+
+
+
+
+
+
+
+
+
 ```
 
 _Call your function with all the defaults, to make sure it works._
 
 ```{r}
-# TODO
+test = fancy()
+plot(test)
+# plot(test)
+plot(test$X1, type = "l")
+test$row_means = rowMeans(test)
+plot(test$row_means, type="l")
+test$row_medians = apply(test, 1, median)
+
+
+
+
+test$one = apply(test[,1:10], 1, quantile, probs = c(.1))
+test$ninety = apply(test[,1:10], 1, quantile, probs = c(.9))
+
+quantile(test,probs = c(1))
+
+
+quantile(test[1,1:10], probs = c(.1))
+quantile(test[1,1:10], probs = c(.9))
+
+
+apply()
+
+
+
+
+
+
+
+test[,1:10]
+
+test$nintey = apply(test, 1, quantile(c(1)))
 ```
 
 ## 2 - Analysis

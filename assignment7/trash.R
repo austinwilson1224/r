@@ -27,6 +27,7 @@ boxplot(cars$speed,  cars$dist)
 
 # data analysis
 cor(cars$speed, cars$dist)
+# 0.8068949
 # positive high correlation -- make a linear model 
 
 

@@ -1,0 +1,176 @@
+---
+title: Midterm
+date: 1 November 2020
+---
+
+```{r echo=FALSE, results='hide',message=FALSE}
+library(ggplot2)
+
+# Just ignore this code :)
+.score = new.env()
+.score$PASS = 0
+.score$FAIL = 0
+
+#' Check that your answer is correct.
+#'
+#' @param expr expression that should evaluate to TRUE if the answer is correct.
+check = function(expr)
+{
+  status = tryCatch(expr, error = identity)
+  if(isTRUE(status)){
+    .score$PASS = .score$PASS + 1
+    cat("PASS")
+  } else {
+    .score$FAIL = .score$FAIL + 1
+    cat("FAIL")
+  }
+}
+
+#' Check that every element of x and y are "close enough".
+#'
+#' @param x numeric vector
+#' @param y numeric vector
+close_enough = function(x, y, epsilon = 1e-5)
+{
+  max(abs(x - y)) < epsilon
+}
+```
+
+
+#### Instructions
+
+- Leave all the calls to `check()` where they are, and use these to verify that you got the right answer.
+- Answer the following questions, and show all your R code.
+- Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+
+
+## 1
+
+(2 pts)
+
+Use `seq` to create a vector `x` containing the sequence -2.0, -1.9, ..., 4.9, 5.0.
+
+```{r}
+x = seq(from = -2.0, to = 5.0, by = .1)
+check(x[1] == -2)
+check(length(x) == 71)
+```
+
+## 2
+
+(4 pts)
+
+The function `dunif` in R evaluates the probability density function (PDF) for the uniform distribution on the interval from ‘min’ to ‘max’.
+
+- Call `dunif` on `x` to create and plot three lines with different colors on the same graph.
+- Add titles and axis labels as appropriate.
+
+Your plot should include one line for the PDF of a Uniform(0, 1) distribution, one line for the PDF of a Uniform(-1, 2) distribution, and one line for the PDF of a Uniform(0.5, 2.5) distribution.
+Hint: You can compute the PDF of a Uniform(a, b) distribution with `dunif(..., min = a, max = b)`.
+
+```{r}
+df_uniform = data.frame(x)
+df_uniform$unif1 = dunif(x, min =  0, max = 1)
+df_uniform$unif2 = dunif(x, min =  -1, max = 2)
+df_uniform$unif3 = dunif(x, min =  .5, max = 2.5)
+g = ggplot() + 
+  geom_line(data = df_uniform, mapping = aes(x = x, y = unif1, color = "red")) + 
+  geom_line(data = df_uniform, mapping = aes(x = x, y = unif2, color = "blue")) + 
+  geom_line(data = df_uniform, mapping = aes(x = x, y = unif3, color = "green")) +
+  labs(title = "uniform function", xlab = "x value", ylab = "probability") + 
+  ylab("probability")
+g
+```
+
+
+## 3
+
+(5 pts)
+
+Define and implement a function `dunif2` that accepts the arguments `x`, `min`, `max`, and behaves exactly like `dunif`.
+Don't do `dunif2 = dunif`, that's cheating :)
+Don't worry about the `log` argument to `dunif`.
+
+```{r}
+result = rep(0, length(x))
+
+dunif2 = function(x, min = 0, max = 1) {
+  p = 1 / (max - min)
+  condition = ( (x >= min) & (x <= max))
+  ifelse(condition, p, 0)
+}
+
+
+
+x3 = seq(from = -10, to = 10)
+check(close_enough(
+  dunif(x3), dunif2(x3)
+))
+check(close_enough(
+  dunif(x3, min = -0.5, max = 2.5), 
+  dunif2(x3, min = -0.5, max = 2.5)
+))
+```
+
+## 4
+
+(3 pts)
+
+Define `mtcars2` by selecting the rows of `mtcars` that have `mpg` higher than the median value of `mpg`, and have `cyl` equal to 4.
+
+```{r}
+median_mpg = median(mtcars$mpg)
+number_cyl = 4
+boolean_mask_4 = ( (mtcars$mpg > median_mpg) & (mtcars$cyl == number_cyl) ) 
+mtcars2 = mtcars[boolean_mask_4,]
+check(nrow(mtcars2) == 11)
+```
+
+
+## 5
+
+(2 pts)
+
+In the following broken code, the goal was to produce a scatter plot of the `mtcars` data frame with `disp` on the x axis, and `mpg` on the y axis, and color determined by `gear`.
+Fix the code so it makes the correct plot.
+
+```{r}
+# View(mtcars)
+g = ggplot(data = mtcars) +
+ geom_line(aes(x = disp, y = mpg), color = mtcars$gear, data = mtcars)
+
+print(g)
+```
+
+## 6
+
+(4 pts)
+
+Suppose you want to know the length of several objects in a list, so you write the following code:
+
+```{r}
+l = list(letters, LETTERS, 1:10, rnorm(5))
+
+l_len = c(length(l[[1]]), length(l[[2]]), length(l[[3]]), length(l[[4]]))
+```
+
+What is wrong with the above approach to calculating the length of each element?
+
+you are writing the same code repeatedly. 
+
+Define `l_len2` by computing the lengths of all elements in `l` in an idiomatic way.
+
+```{r}
+# TODO
+l_len2 = sapply(l, FUN = length)
+check(close_enough(l_len, l_len2))
+```
+
+
+## Auto Score
+
+Your score below doesn't include parts of the assignment that aren't automatically graded, for example, plots, short answers, and data interpretation.
+
+```{r echo=FALSE}
+sprintf("Auto score:  %i / %i total points", .score$PASS, .score$PASS + .score$FAIL)
+```

@@ -16,3 +16,6 @@ class(vector)
 class(list)
 
 
+test = data.frame(x = c(1,2,3,4,5))
+test$trash = c("austin","john","wilson","is","cool")
+test

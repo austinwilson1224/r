@@ -161,7 +161,6 @@ you are writing the same code repeatedly.
 Define `l_len2` by computing the lengths of all elements in `l` in an idiomatic way.
 
 ```{r}
-# TODO
 l_len2 = sapply(l, FUN = length)
 check(close_enough(l_len, l_len2))
 ```

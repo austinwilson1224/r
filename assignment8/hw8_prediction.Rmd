@@ -1,0 +1,120 @@
+---
+title: Predicting a known function
+date: 8 November 2020
+---
+
+#### Outcomes
+
+- Fit statistical learning models to univariate data
+- Plot fitted models
+- Interpret models
+
+
+#### Instructions
+
+- Answer the following questions, and show all your R code.
+- Upload your submission to Canvas in nicely formatted HTML generated from Rstudio.
+
+
+## generating simulated data
+
+Choose `n` between 30 and 200, and sample `n` values for `x` from a random uniform (0, 1) distribution.
+Define `y` corresponding to `x` from the following quadratic function:
+
+$$
+y = 5x^2 - 4x - 10 + \epsilon
+$$
+
+Here ε is normally distributed with mean 0 and standard deviation 0.1.
+Plot your data.
+
+```{r}
+set.seed(138)
+x = runif(n = 300, min = 0, max = 1)
+epsilon = rnorm(n = 300, mean = 0, sd = .1)
+y = 5 * (x ** 2) - 4 * x + epsilon
+plot(x,y)
+```
+
+## linear model
+
+Use `fit1 = lm(y ~ x)` to fit a linear model to the data.
+What mathematical function of `x` does the fitted model represent?
+Implement the fitted model as a function in R, and verify that it matches the values predicted by the model.
+
+it looks like a quadratic function
+
+$$
+y = ax^2 + b
+$$
+
+Hint: you can do something like the following:
+```{r}
+fit1 = lm(y ~ x)
+x1 = seq(from = 0, to = 29, by = 0.1)
+plot(x,y)
+y_pred = predict(fit1, data.frame(x = x1))
+lines(x1,y_pred)
+```
+
+
+## quadratic model
+
+Create a new linear model than includes a quadratic `x^2` term, for example, using `lm(y ~ x + I(x^2))`.
+What mathematical function of `x` does the fitted model represent?
+
+```{r}
+fit1 = lm(y ~ x + I(x^2))
+x1 = seq(from = 0, to = 29, by = 0.1)
+plot(x,y)
+y_pred = predict(fit1, data.frame(x = x1))
+lines(x1,y_pred)
+```
+
+
+
+## comparing models
+
+Plot lines for the linear and quadratic model together with the data points.
+Which appears to do a better job fitting the data?
+Explain.
+
+```{r}
+fit1 = lm(y ~ x)
+fit2 = lm(y ~ x + I(x^2))
+x1 = seq(from = 0, to = 29, by = 0.1)
+plot(x,y)
+
+y_pred1 = predict(fit1, data.frame(x = x1))
+y_pred2 = predict(fit2, data.frame(x = x1))
+
+lines(x1,y_pred1, col = "red")
+lines(x1,y_pred2, col = "blue")
+```
+
+## recursive partitioning
+
+- Fit a recursive partitioning model to the data using `rpart`.
+- Experiment with the parameters of the algorithm by passing different parameters to the algorithm, see `?rpart.control`.
+- Plot and compare two different models from `rpart` for this data set.
+- Which parameters appear to make the recursive partitioning model fit better or worse on this data set?
+
+
+## test data performance
+
+Simulate more values from the true model
+
+$$
+y = 5x^2 - 4x - 10 + \epsilon
+$$
+where `x` is between 0 and 1.
+
+Compare the performance of three different models (linear, quadratic, and recursive partitioning) on this test set.
+Which model does the best job minimizing the sum of squared error?
+
+
+## a data set to suit the model
+
+Simulate a slightly noisy data set where the recursive partitioning model should perform much better than the simple linear model.
+What characteristics of the data make the recursive partitioning model work well?
+Fit and plot both a linear model and a recursive partitioning model on the same plot for this data to demonstrate that recursive partitioning performs better.

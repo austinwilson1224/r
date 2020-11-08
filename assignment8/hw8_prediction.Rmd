@@ -33,6 +33,7 @@ set.seed(138)
 x = runif(n = 300, min = 0, max = 1)
 epsilon = rnorm(n = 300, mean = 0, sd = .1)
 y = 5 * (x ** 2) - 4 * x + epsilon
+d = data.frame(x,y)
 plot(x,y)
 ```
 
@@ -54,7 +55,7 @@ fit1 = lm(y ~ x)
 x1 = seq(from = 0, to = 29, by = 0.1)
 plot(x,y)
 y_pred = predict(fit1, data.frame(x = x1))
-lines(x1,y_pred)
+lines(x1,y_pred, col = "red")
 ```
 
 
@@ -68,7 +69,7 @@ fit1 = lm(y ~ x + I(x^2))
 x1 = seq(from = 0, to = 29, by = 0.1)
 plot(x,y)
 y_pred = predict(fit1, data.frame(x = x1))
-lines(x1,y_pred)
+lines(x1,y_pred, col = "red")
 ```
 
 
@@ -89,7 +90,7 @@ y_pred1 = predict(fit1, data.frame(x = x1))
 y_pred2 = predict(fit2, data.frame(x = x1))
 
 lines(x1,y_pred1, col = "red")
-lines(x1,y_pred2, col = "blue")
+lines(x1,y_pred2, col = "red")
 ```
 
 ## recursive partitioning
@@ -98,6 +99,21 @@ lines(x1,y_pred2, col = "blue")
 - Experiment with the parameters of the algorithm by passing different parameters to the algorithm, see `?rpart.control`.
 - Plot and compare two different models from `rpart` for this data set.
 - Which parameters appear to make the recursive partitioning model fit better or worse on this data set?
+
+```{r}
+fit = rpart(y ~ x + I(x^2),  data = d, minsplit = 20)
+#fit4 = rpart(y ~ x, minsplit=20,minbucket=20)
+#fit5 = rpart(y ~ x, maxdepth = 20)
+yhat = predict(fit)
+test = data.frame(x,yhat)
+#fit = smooth.spline(test)
+plot(x,yhat)
+
+lines(x,yhat)
+#rpart.plot(fit4, type = 0)
+
+```
+
 
 
 ## test data performance

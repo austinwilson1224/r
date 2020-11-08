@@ -25,3 +25,40 @@ mse = function(model, test_data) {
 }
 
 mse(fit, dtest)
+
+
+
+
+# rpart stuff
+library(rpart)
+n = 100
+x = seq(0,3, length.out=n)
+y = rep(2,n)
+x
+y
+length(x)
+length(y)
+y[x<1] = 1
+y
+y[2<x] = 3
+y
+noise = rnorm(n, sd=.2)
+noise
+y = y + noise
+d = data.frame(x,y)
+plot(x,y)
+
+
+fit1 = rpart(y ~ x, data = d)
+plot(x,y)
+lines(x,predict(fit1))
+
+
+
+
+n = 101
+x = seq(n)
+y = x 
+fit = rpart(y ~ x, minsplit = 51)
+plot(x,y)
+lines(x,predict(fit))

@@ -101,15 +101,22 @@ lines(x1,y_pred2, col = "red")
 - Which parameters appear to make the recursive partitioning model fit better or worse on this data set?
 
 ```{r}
-fit = rpart(y ~ x + I(x^2),  data = d, minsplit = 20)
-#fit4 = rpart(y ~ x, minsplit=20,minbucket=20)
-#fit5 = rpart(y ~ x, maxdepth = 20)
-yhat = predict(fit)
-test = data.frame(x,yhat)
-#fit = smooth.spline(test)
-plot(x,yhat)
+set.seed(138)
+x = runif(n = 300, min = 0, max = 1)
+epsilon = rnorm(n = 300, mean = 0, sd = .1)
+y = 5 * (x ** 2) - 4 * x + epsilon
 
-lines(x,yhat)
+
+
+fit3 = rpart(y ~ x + I(x^2),  data = d, minsplit = 20)
+fit4 = rpart(y ~ x, minsplit=20,minbucket=20)
+fit5 = rpart(y ~ x, maxdepth = 20)
+# yhat = predict(fit)
+# test = data.frame(x,yhat)
+# fit = smooth.spline(test)
+# plot(x,yhat)
+
+#lines(order(x),yhat, type = "l")
 #rpart.plot(fit4, type = 0)
 
 ```
@@ -125,8 +132,47 @@ y = 5x^2 - 4x - 10 + \epsilon
 $$
 where `x` is between 0 and 1.
 
+```{r}
+x_test = runif(n = 1000, min = 0, max = 1)
+
+
+f_x = function(x, n = 100, min = 0, max = 1) {
+  # x = runif(n = n, min = min, max = max)
+  epsilon = rnorm(n = n, mean = 0, sd = .1)
+  5 * (x ** 2) - 4 * x + epsilon
+}
+
+y_test = f_x(x_test,n = 1000)
+d_test = data.frame(x_test,y_test)
+# y
+# plot(x_test,y_true)
+```
+
+
 Compare the performance of three different models (linear, quadratic, and recursive partitioning) on this test set.
 Which model does the best job minimizing the sum of squared error?
+
+```{r}
+mse = function(model, test_data) {
+  predictions = predict(model,test_data)
+  error = predictions - test_data$y
+  squared = error ** 2
+  mean = mean(squared)
+  mean
+}
+
+mse_linear = mse(fit1,d_test)
+mse_quadratic = mse(fit2,d_test)
+mse_rpart1 = mse(fit3,d_test)
+mse_rpart2 = mse(fit4,d_test)
+mse_rpart3 = mse(fit5,d_test)
+mse_linear
+mse_quadratic
+mse_rpart1
+mse_rpart2 # best performance 
+mse_rpart3
+```
+
 
 
 ## a data set to suit the model
@@ -134,3 +180,20 @@ Which model does the best job minimizing the sum of squared error?
 Simulate a slightly noisy data set where the recursive partitioning model should perform much better than the simple linear model.
 What characteristics of the data make the recursive partitioning model work well?
 Fit and plot both a linear model and a recursive partitioning model on the same plot for this data to demonstrate that recursive partitioning performs better.
+
+
+
+```{r}
+x = runif(n = 1000, min = 0, max = 1)
+noise = rnorm(n = 1000, mean = 0, sd = .5)
+y = 3 * x + 5 + noise
+d = data.frame(x,y)
+d = d[order(x),]
+fit_linear = lm(y ~ x, data = d)
+fit_rpart = rpart(y ~ x, data  = d, minsplit=20,minbucket=20)
+plot(x,y)
+# sort(d$x)
+lines(d$x,predict(fit_linear,d),col = "red")
+lines(sort(d$x),predict(fit_rpart,d), col = "red")
+```
+

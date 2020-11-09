@@ -51,10 +51,10 @@ $$
 
 Hint: you can do something like the following:
 ```{r}
-fit1 = lm(y ~ x)
+linear_fit = lm(y ~ x)
 x1 = seq(from = 0, to = 29, by = 0.1)
 plot(x,y)
-y_pred = predict(fit1, data.frame(x = x1))
+y_pred = predict(linear_fit, data.frame(x = x1))
 lines(x1,y_pred, col = "red")
 ```
 
@@ -65,14 +65,14 @@ Create a new linear model than includes a quadratic `x^2` term, for example, usi
 What mathematical function of `x` does the fitted model represent?
 
 ```{r}
-fit1 = lm(y ~ x + I(x^2))
+quadratic_fit = lm(y ~ x + I(x^2))
 x1 = seq(from = 0, to = 29, by = 0.1)
 plot(x,y)
-y_pred = predict(fit1, data.frame(x = x1))
+y_pred = predict(quadratic_fit, data.frame(x = x1))
 lines(x1,y_pred, col = "red")
 ```
 
-
+- This looks like a quadratic function, which is what we created in the previous problem. 
 
 ## comparing models
 
@@ -81,17 +81,19 @@ Which appears to do a better job fitting the data?
 Explain.
 
 ```{r}
-fit1 = lm(y ~ x)
-fit2 = lm(y ~ x + I(x^2))
+# fit1 = lm(y ~ x)
+# fit2 = lm(y ~ x + I(x^2))
 x1 = seq(from = 0, to = 29, by = 0.1)
 plot(x,y)
 
-y_pred1 = predict(fit1, data.frame(x = x1))
-y_pred2 = predict(fit2, data.frame(x = x1))
+y_pred1 = predict(linear_fit, data.frame(x = x1))
+y_pred2 = predict(quadratic_fit, data.frame(x = x1))
 
 lines(x1,y_pred1, col = "red")
 lines(x1,y_pred2, col = "red")
 ```
+
+- The quatratic model is better at fitting the data. This is because the line is closer the the trend of the data. The difference between our prediction and the actual value is smaller than with the linear model. The linear model is very inaccurate except in two places. (.2 and .8)
 
 ## recursive partitioning
 
@@ -101,27 +103,36 @@ lines(x1,y_pred2, col = "red")
 - Which parameters appear to make the recursive partitioning model fit better or worse on this data set?
 
 ```{r}
-set.seed(138)
-x = runif(n = 300, min = 0, max = 1)
-epsilon = rnorm(n = 300, mean = 0, sd = .1)
+library(rpart)
+x = sort(runif(n = 1000, min = 0, max = 1))
+epsilon = rnorm(n = 1000, mean = 0, sd = .1)
 y = 5 * (x ** 2) - 4 * x + epsilon
 
 
+d = data.frame(x,y)
+d = d[order(x),]
 
-fit3 = rpart(y ~ x + I(x^2),  data = d, minsplit = 20)
-fit4 = rpart(y ~ x, minsplit=20,minbucket=20)
-fit5 = rpart(y ~ x, maxdepth = 20)
-# yhat = predict(fit)
-# test = data.frame(x,yhat)
-# fit = smooth.spline(test)
-# plot(x,yhat)
 
-#lines(order(x),yhat, type = "l")
-#rpart.plot(fit4, type = 0)
+fit = rpart(y ~ x + I(x^2), data = d)
+fit1 = rpart(y ~ x + I(x^2),  data = d, minsplit = 20)
+fit2 = rpart(y ~ x + I(x^2), data = d, minsplit=20,minbucket=200,maxdepth=20)
+fit3 = rpart(y ~ x + I(x^2),  data = d, minbucket = 5)
+
+
+
+with(d,plot(x,y))
+lines(d$x,predict(fit), col = "red")
+lines(d$x,predict(fit1), col = "blue")
+lines(d$x,predict(fit2), col = "green")
+lines(d$x,predict(fit3))
+
+
+
 
 ```
 
 
+All of my lines are very similar. Changing minbucket is the only parameter that makes a significant change to the model. This actually causes the model to degrade in performance. The black line is the same line for 3 different model parameters. (fit, fit1,fit3) The default parameters work great for this model. Increasing min bucket makes the model worse.
 
 ## test data performance
 
@@ -133,19 +144,16 @@ $$
 where `x` is between 0 and 1.
 
 ```{r}
-x_test = runif(n = 1000, min = 0, max = 1)
+x_test = sort(runif(n = 1000, min = 0, max = 1))
 
 
 f_x = function(x, n = 100, min = 0, max = 1) {
-  # x = runif(n = n, min = min, max = max)
   epsilon = rnorm(n = n, mean = 0, sd = .1)
   5 * (x ** 2) - 4 * x + epsilon
 }
 
 y_test = f_x(x_test,n = 1000)
-d_test = data.frame(x_test,y_test)
-# y
-# plot(x_test,y_true)
+d = data.frame(x_test,y_test)
 ```
 
 
@@ -153,27 +161,22 @@ Compare the performance of three different models (linear, quadratic, and recurs
 Which model does the best job minimizing the sum of squared error?
 
 ```{r}
-mse = function(model, test_data) {
-  predictions = predict(model,test_data)
-  error = predictions - test_data$y
-  squared = error ** 2
-  mean = mean(squared)
-  mean
+mse = function(model, d) {
+  mean((predict(model,d) - d$y) ** 2)
 }
 
-mse_linear = mse(fit1,d_test)
-mse_quadratic = mse(fit2,d_test)
-mse_rpart1 = mse(fit3,d_test)
-mse_rpart2 = mse(fit4,d_test)
-mse_rpart3 = mse(fit5,d_test)
+mse_linear = mse(linear_fit,d)
+mse_quadratic = mse(quadratic_fit,d)
+mse_rpart = mse(fit,d)
+mse_rpart1 = mse(fit1,d)
+mse_rpart2 = mse(fit2,d)
 mse_linear
-mse_quadratic
+mse_quadratic # best performance 
 mse_rpart1
-mse_rpart2 # best performance 
-mse_rpart3
+mse_rpart2 
 ```
 
-
+- the quadratic moedal has the best performance. MSE for quadtric is an order of magnitude smaller than the others. 
 
 ## a data set to suit the model
 
@@ -184,16 +187,27 @@ Fit and plot both a linear model and a recursive partitioning model on the same 
 
 
 ```{r}
-x = runif(n = 1000, min = 0, max = 1)
-noise = rnorm(n = 1000, mean = 0, sd = .5)
-y = 3 * x + 5 + noise
+x = runif(n = 100, min = -10, max = 10)
+noise = rnorm(n = 100, mean = 0, sd = 10)
+# y = 3 * x + 5 + noise
+# y =  4 * x ** 4 + (3-x) ** 3 + x ** 2 + 3 + noise + sin(x)
+y = x ** 3 + noise
 d = data.frame(x,y)
 d = d[order(x),]
-fit_linear = lm(y ~ x, data = d)
-fit_rpart = rpart(y ~ x, data  = d, minsplit=20,minbucket=20)
+linear_fit = lm(y ~ x, data = d)
+rpart_fit = rpart(y ~ x, data  = d)
+cubic_fit = lm(y ~ x + I(x^2) + I(x^3), data = d)
 plot(x,y)
 # sort(d$x)
-lines(d$x,predict(fit_linear,d),col = "red")
-lines(sort(d$x),predict(fit_rpart,d), col = "red")
+lines(d$x,predict(linear_fit,d),col = "red")
+lines(d$x,predict(rpart_fit,d), col = "red")
+lines(d$x,predict(cubic_fit,d), col = "red")
+mse_linear = mse(linear_fit,d)
+mse_rpart = mse(rpart_fit,d)
+mse_cubic = mse(cubic_fit,d)
+mse_linear 
+mse_rpart # lower
+mse_cubic # lowest 
 ```
 
+- rpart has lower MSE than a simple linear model. The cubic model has the lowest because it is a cubic function.The rpart model works better with the data because it is more flexible. The function can go up or down. A simple linear model is very constrained. 

@@ -33,23 +33,31 @@ Which column(s) represent interest rate?_
 ```{r}
 set.seed(280)
 data = read.csv("/Users/austinwilson/coding/r/assignment9/CDA_ALL_Raw.csv")
-data = CDA_ALL_Raw
-data = read.csv("CDA_ALL_Raw.csv")
+# data = CDA_ALL_Raw
+# data = read.csv("CDA_ALL_Raw.csv")
+
+# View(data)
 
 
 #### randomize data
+nrow(data)
+sample(nrow(data))
 data = data[sample(nrow(data)),]
-
+View(data)
 
 
 train_size = floor(dim(data)[1] * .8)
-train_index = sample(seq_len(nrow(data)), size = size)
+train_size
+test_size = dim(data)[1] - train_size
+test_size
 
-train = data[train_index,]
-test = data[-train_index]
 
-nrow(data)
+train = data[1:train_size,]
+test = tail(data,test_size)
 
+
+# checking dimension 
+dim(train)[1] + dim(test)[1] == dim(data)[1] 
 
 
 # find interest rate 
@@ -70,7 +78,7 @@ For example, you could add a logical column indicating whether the term "lease" 
 Why do you think this new column will help you improve the accuracy of your model?_
 
 ```{r}
-
+data$lease = grep("lease", data)
 ```
 
 

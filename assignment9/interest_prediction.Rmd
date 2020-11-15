@@ -78,7 +78,40 @@ For example, you could add a logical column indicating whether the term "lease" 
 Why do you think this new column will help you improve the accuracy of your model?_
 
 ```{r}
-data$lease = grep("lease", data)
+data$lease = grepl("lease", data)
+View(data)
+colnames(data)
+data$lease
+unique(data$lease)
+
+
+get_lease = function(data = data, column) {
+  grepl(pattern = "lease", x = data[,column])
+}
+
+
+
+
+get_lease(data, "Financial.Advisor")
+
+data$lease <- sapply(colnames(data), function(x) grepl("lease", data[,x]))
+data$lease
+View(data)
+colnames(data)
+dim(data)
+sadf = sapply(data, grepl, pattern = "lease", value = TRUE)
+
+x1 = data[1,]
+
+grep("lease", x1)
+
+sapply(x = data, FUN = grep("lease"))
+l
+
+
+grep(x = data$CDIAC.Number, "lease")
+
+
 ```
 
 
@@ -91,7 +124,15 @@ For example, a model with 3 input columns differs from a model with 60 input col
 Briefly describe the two models you ended up with._
 
 ```{r}
+colnames(data)
+# TIC.Interest.Rate"                "NIC.Interest.Rate"  
+model1 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money, data = data)
+model2 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = data)
+model3 = rpart(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = data)
 
+summary(model1)
+summary(model2)
+summary(model3)
 ```
 
 

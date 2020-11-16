@@ -15,7 +15,7 @@ dim(cardio)
 summary(cardio)
 colnames(cardio)
 
-# lets see which of these are binary 
+# lets see which of these are binary -- anamia, diabetes, high_blood_pressure, sex, smoking, DEATH_EVENT
 sapply(cardio, unique)
 sum(cardio$DEATH_EVENT == 0)
 sum(cardio$DEATH_EVENT == 1)
@@ -31,3 +31,37 @@ summary(model1)
 
 model = lm(DEATH_EVENT ~ age + anaemia + creatinine_phosphokinase + diabetes + ejection_fraction + high_blood_pressure + platelets + serum_creatinine + serum_sodium + sex + smoking + time, data = cardio, family = "binomial")
 model
+
+
+
+
+
+######vosia;ozatopm
+
+hist(cardio$age)
+
+
+library("dplyr")
+
+
+cardio %>% mutate(DEATH_EVENT = factor(DEATH_EVENT, labels = c("dead","alive")), age = factor(age))
+ggplot(cardio, aes(x = age, fill = DEATH_EVENT)) + geom_bar() + theme_classic()
+
+
+ggplot(cardio, aes(x = age, fill = DEATH_EVENT)) + geom_bar(position = position_dodge()) + theme_classic()
+
+range(cardio$age)
+
+
+# test
+library(dplyr)
+# Step 1
+data <- mtcars %>%
+  #Step 2
+mutate(am = factor(am, labels = c("auto", "man")),
+         cyl = factor(cyl))
+
+ggplot(data, aes(x = cyl, fill = am)) +
+  geom_bar() +
+  theme_classic()
+

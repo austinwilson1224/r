@@ -1,6 +1,13 @@
+
+# WASTE RECOGNITION PROJECT 
+# https://www.kaggle.com/techsash/waste-classification-data
+
+
 import pandas as pd 
 import numpy as np 
 import os
+import requests
+import urllib
 from PIL import Image
 
 from sklearn.model_selection import train_test_split
@@ -16,6 +23,15 @@ from tensorflow.keras.applications.vgg19 import VGG19
 
 
 path =  "/Users/austinwilson/coding/r/final-project/waste-recognition/DATASET/TRAIN"
+download_link = "https://www.kaggle.com/techsash/waste-classification-data/download"
+req = requests.get(download_link, allow_redirects = True)
+req.content
+
+open(req.content,"wb")
+
+urllib.urlretrieve(download_link,"/Users/austinwilson/coding/r/final-project/waste-recognition/data2")
+open("data2", "wb").write(req.content)
+
 
 # class names
 class_names = os.listdir(path)[1:]

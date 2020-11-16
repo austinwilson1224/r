@@ -33,6 +33,7 @@ Which column(s) represent interest rate?_
 ```{r}
 set.seed(280)
 data = read.csv("/Users/austinwilson/coding/r/assignment9/CDA_ALL_Raw.csv")
+data2 = read.csv("/Users/austinwilson/coding/r/assignment9/CDA_ALL_Raw.csv")
 # randomize data
 data = data[sample(nrow(data)),]
 # size of the train and test set
@@ -47,16 +48,22 @@ interest
 ```
 
 
+The columns TIC.Interest.Rate and NIC.Interest.Rate represent the interest rate. I used TIC.Interest.Rate because this represents true interest rate.  
+
 ### Calculated Columns
 
 _Define one or more new columns from existing text columns in the data set.
 For example, you could add a logical column indicating whether the term "lease" appears in some column.
 Why do you think this new column will help you improve the accuracy of your model?_
 
+
 ```{r}
-data$lease <- sapply(colnames(data), function(x) grepl("lease", data[,x]))
+data$lease = grepl("lease", data$Debt.Type, ignore.case = TRUE)
+test$lease = grepl("lease", test$Debt.Type, ignore.case = TRUE)
+train$lease = grepl("lease", train$Debt.Type, ignore.case = TRUE)
 ```
 
+- This will help improve the accuracy of you model because it will tell you weather the loan was a lease or not. A lease may have a lower interest rate because the capital is not owned by the debtor. In my case I am only using numerical columns in my model so this column will not be used. 
 
 ### Models
 
@@ -66,48 +73,42 @@ Note that you can come up with different models by using different subsets of co
 For example, a model with 3 input columns differs from a model with 60 input columns.
 Briefly describe the two models you ended up with._
 
+
 ```{r}
 # this is just to print out which columns are numeric 
-numeric_columns_ = c()
+numeric_columns = c()
 for (column in colnames(data)) {
   if (class(data[,column])[1] == "numeric") {
-    # print(column)
-    numeric_columns_ = c(numeric_columns_,column)
+    numeric_columns = c(numeric_columns,column)
   }
 }
-numeric_columns_
+numeric_columns
+numeric_columns_with_most_data = c("TIC.Interest.Rate", "Principal.Amount", "New.Money", "Refunding.Amount", "Issue.Costs.Pct.of.Principal.Amt", "Total.Issuance.Costs", "UW.Total.Discount.Spread")
 ```
 
 
 ```{r}
-# I have manually identified which columns have the least na values (might be a better way to do it) 
-numeric_columns_with_most_data = c("TIC.Interest.Rate", "Principal.Amount", "New.Money", "Refunding.Amount", "Issue.Costs.Pct.of.Principal.Amt", "Total.Issuance.Costs", "UW.Total.Discount.Spread")
+# numeric columns only 
+test_numeric = test[,numeric_columns]
+test_numeric = na.omit(test_numeric)
 
-# trying to create the largest subset with no na values 
-test1 = test[,numeric_columns_with_most_data]
-test1 = na.omit(test1)
+train_numeric = train[,numeric_columns]
+train_numeric = na.omit(train_numeric)
 
-test = test[,numeric_columns]
-test = na.omit(test)
+model0 = lm(TIC.Interest.Rate ~ Principal.Amount, data = train_numeric)
+model1 = lm(TIC.Interest.Rate ~ ., data = train_numeric)
+library("rpart")
+model2 = rpart(TIC.Interest.Rate ~ ., data = train_numeric)
+model3 = lm(TIC.Interest.Rate ~ Principal.Amount + NIC.Interest.Rate + NIC.Interest.Rate + Issue.Costs.Pct.of.Principal.Amt + Total.Issuance.Costs +  UW.Total.Discount.Spread + Credit.Enhancement.Fee, data = train_numeric)
 
-train1 = train[,numeric_columns_with_most_data]
-train1 = na.omit(train1)
-
-train = train[,numeric_columns]
-train = na.omit(train)
-
-
-
-model = lm(TIC.Interest.Rate ~ ., data = train)
-model1 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Issue.Costs.Pct.of.Principal.Amt + Total.Issuance.Costs + UW.Total.Discount.Spread, data = train1)
-model2 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = train)
-model3 = rpart(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = train)
-model4 = 
-
+summary(model0)
 summary(model1)
-summary(model2)
 summary(model3)
+# model2
 ```
+
+
+- The two models I came up with were one with all the numeric columns and one that took the best predictors. I used the p-value to eliminate a couple of columns and improve my models accuracy. I will not list out all the columns for the initial model. I also tested a model that just used principle amount (a good predictor of interest rate) which was much less accurate than my final model. The final model used Principal.Amount, NIC.Interest.Rate, NIC.Interest.Rate, Issue.Costs.Pct.of.Principal.Amt, Total.Issuance.Costs, UW.Total.Discount.Spread, Credit.Enhancement.Fee to predict interest rate. 
 
 
 ### Evaluating Performance
@@ -117,36 +118,83 @@ Do the models do a reasonable job of predicting interest rate?
 Find the rows where the predicted interest rate is farthest from the true interest rate.
 Why might the model have done a poor job on these rows?_
 
+
+
+
 ```{r}
-# before test has 13409 rows
-# before train has 53634 rows
-# use na.omit 
-test = na.omit(test)
-# train = na.omit(train)
+
 average_absolute_difference = function(predicted, actual) {
-  length = length(predicted)
-  difference = predicted - actual
-  difference_squared = difference ** 2
-  absolute_difference = sqrt(difference_squared)
-  sum(absolute_difference, na.rm = TRUE) / length
+  absolute_difference = abs(predicted- actual)
+  mean(absolute_difference)
+}
+
+abs_difference = function(predicted, actual) {
+  abs(predicted- actual)
 }
 
 
-prediction1 = predict(model1, test, na.rm = TRUE)
-aad1 = average_absolute_difference(prediction1, test$TIC.Interest.Rate)
+
+prediction0 = predict(model0, test_numeric)
+add0 = average_absolute_difference(prediction0, test_numeric$TIC.Interest.Rate)
+test_numeric$prediction0 = prediction0
+test_numeric$difference0 = abs_difference(prediction0, test_numeric$TIC.Interest.Rate)
+
+
+test_numeric$mother_russia = abs(prediction0 - test_numeric$TIC.Interest.Rate)
+
+prediction1 = predict(model1, test_numeric)
+aad1 = average_absolute_difference(prediction1, test_numeric$TIC.Interest.Rate)
+test_numeric$prediction1 = prediction1
+test_numeric$difference1 = abs_difference(prediction1, test_numeric$TIC.Interest.Rate)
+
+
+
+prediction2 = predict(model2, test_numeric)
+aad2 = average_absolute_difference(prediction2, test_numeric$TIC.Interest.Rate)
+test_numeric$prediction2 = prediction2
+test_numeric$difference2 = abs_difference(prediction2, test_numeric$TIC.Interest.Rate)
+
+
+prediction3 = predict(model3, test_numeric)
+aad3 = average_absolute_difference(prediction3, test_numeric$TIC.Interest.Rate)
+test_numeric$prediction3 = prediction3
+test_numeric$difference3 = abs_difference(prediction3, test_numeric$TIC.Interest.Rate)
+
+
+
+add0
 aad1
-
-prediction2 = predict(model2, test, na.rm = TRUE)
-aad2 = average_absolute_difference(prediction2, test$TIC.Interest.Rate)
 aad2
-
-
-prediciton3 = predict(model3, test, na.rm = TRUE)
-aad3 = average_absolute_difference(prediciton3, test$TIC.Interest.Rate)
 aad3
 
-sort(which(test$TIC.Interest.Rate > prediction1))
 
-test[5,]
+test_numeric = test_numeric[order(test_numeric$difference3),]
 
+
+tail(test_numeric)
+
+
+# these are the rows that we could not accurately predict (furthest from the actual interest rate)
+# 27674
+# 35262
+# 23857
+# 50954
+# 33339
+# 64188
+data[27674,]
+data[35262,]
+data[23857,]
+data[50954,]
 ```
+
+
+- These models do a reasonable job of predicting interest rate. The first model was the least acurate because it only depended on principle amount. I then made a model with all of the numeric columns. I looked at the summary of this model and selected only the columns that had a small p-value. This model was the most accurate of them all. 
+
+- For the one that was furthest away (row 2674) this may be innacurate because the source of repayment was private obligor payments. This could potentially cause a higher interest rate because a private authority may be more likely to default on a payment. 
+
+- For the second least accurate row (35262) it may be because this was a lease. It seems that the lease column did come in handy, although this is purely speculation. 
+
+- The next least accurate was for Davis Joint Unified School District! I don't see any reason why this would be inaccurate. 
+
+- The next was also using private obligor payments as the repayment source which I think may have contributed to the inaccuracy. 
+

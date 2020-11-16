@@ -33,41 +33,17 @@ Which column(s) represent interest rate?_
 ```{r}
 set.seed(280)
 data = read.csv("/Users/austinwilson/coding/r/assignment9/CDA_ALL_Raw.csv")
-# data = CDA_ALL_Raw
-# data = read.csv("CDA_ALL_Raw.csv")
-
-# View(data)
-
-
-#### randomize data
-nrow(data)
-sample(nrow(data))
+# randomize data
 data = data[sample(nrow(data)),]
-View(data)
-
-
+# size of the train and test set
 train_size = floor(dim(data)[1] * .8)
-train_size
 test_size = dim(data)[1] - train_size
-test_size
-
-
-train = data[1:train_size,]
+# subset data to get train and test sets  
+train = head(data,train_size)
 test = tail(data,test_size)
-
-
-# checking dimension 
-dim(train)[1] + dim(test)[1] == dim(data)[1] 
-
-
 # find interest rate 
-columns = colnames(data)
-
-
-grep("Interest", columns, value = TRUE)
-
-# "TIC.Interest.Rate"                "NIC.Interest.Rate"               
-# [28] "Interest.Type"                    "Other.Interest.Type" 
+interest = grep("Interest", colnames(data), value = TRUE)
+interest
 ```
 
 
@@ -91,11 +67,42 @@ For example, a model with 3 input columns differs from a model with 60 input col
 Briefly describe the two models you ended up with._
 
 ```{r}
-colnames(data)
-# TIC.Interest.Rate"                "NIC.Interest.Rate"  
-model1 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money, data = data)
-model2 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = data)
-model3 = rpart(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = data)
+# this is just to print out which columns are numeric 
+numeric_columns_ = c()
+for (column in colnames(data)) {
+  if (class(data[,column])[1] == "numeric") {
+    # print(column)
+    numeric_columns_ = c(numeric_columns_,column)
+  }
+}
+numeric_columns_
+```
+
+
+```{r}
+# I have manually identified which columns have the least na values (might be a better way to do it) 
+numeric_columns_with_most_data = c("TIC.Interest.Rate", "Principal.Amount", "New.Money", "Refunding.Amount", "Issue.Costs.Pct.of.Principal.Amt", "Total.Issuance.Costs", "UW.Total.Discount.Spread")
+
+# trying to create the largest subset with no na values 
+test1 = test[,numeric_columns_with_most_data]
+test1 = na.omit(test1)
+
+test = test[,numeric_columns]
+test = na.omit(test)
+
+train1 = train[,numeric_columns_with_most_data]
+train1 = na.omit(train1)
+
+train = train[,numeric_columns]
+train = na.omit(train)
+
+
+
+model = lm(TIC.Interest.Rate ~ ., data = train)
+model1 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Issue.Costs.Pct.of.Principal.Amt + Total.Issuance.Costs + UW.Total.Discount.Spread, data = train1)
+model2 = lm(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = train)
+model3 = rpart(TIC.Interest.Rate ~ Principal.Amount + New.Money + Refunding.Amount + Net.Issue.Discount.Premium, data = train)
+model4 = 
 
 summary(model1)
 summary(model2)
@@ -111,8 +118,35 @@ Find the rows where the predicted interest rate is farthest from the true intere
 Why might the model have done a poor job on these rows?_
 
 ```{r}
-prediction1 = predict(model1, test)
-prediction2 = predict(model2, test)
-prediciton3 = predict(model3, test)
+# before test has 13409 rows
+# before train has 53634 rows
+# use na.omit 
+test = na.omit(test)
+# train = na.omit(train)
+average_absolute_difference = function(predicted, actual) {
+  length = length(predicted)
+  difference = predicted - actual
+  difference_squared = difference ** 2
+  absolute_difference = sqrt(difference_squared)
+  sum(absolute_difference, na.rm = TRUE) / length
+}
+
+
+prediction1 = predict(model1, test, na.rm = TRUE)
+aad1 = average_absolute_difference(prediction1, test$TIC.Interest.Rate)
+aad1
+
+prediction2 = predict(model2, test, na.rm = TRUE)
+aad2 = average_absolute_difference(prediction2, test$TIC.Interest.Rate)
+aad2
+
+
+prediciton3 = predict(model3, test, na.rm = TRUE)
+aad3 = average_absolute_difference(prediciton3, test$TIC.Interest.Rate)
+aad3
+
+sort(which(test$TIC.Interest.Rate > prediction1))
+
+test[5,]
 
 ```

@@ -1,0 +1,29 @@
+---
+title: "eda"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+https://dahtah.github.io/imager/imager.html
+
+https://www.rdocumentation.org/packages/imager/versions/0.42.3/topics/load.image
+
+https://cran.r-project.org/web/packages/imager/vignettes/gettingstarted.html
+
+
+
+
+```{r}
+
+
+# working directory is 
+# /Users/austinwilson/coding/r/final-project/waste-recognition/r
+img = load.image("test1.jpeg")
+img
+plot(img)
+getwd()
+```
+

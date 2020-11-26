@@ -2,6 +2,11 @@ library(keras)
 library(tensorflow)
 
 
+# why not use r?
+# https://blogs.rstudio.com/ai/posts/2019-08-29-using-tf-from-r/
+# The short answer is, you have keras, tensorflow and reticulate installed. reticulate embeds a Python session within the R process.
+
+
 cifar = dataset_cifar10()
 
 
@@ -69,3 +74,56 @@ evaluate(model, cifar$test$x, cifar$test$y, verbose = 0)
 # transfer learning
 # https://tensorflow.rstudio.com/tutorials/advanced/images/transfer-learning-hub/
 ########## 
+library(keras)
+library(tfhub)
+library(tfhub)
+
+# image classification models 
+# https://tfhub.dev/s?module-type=image-classification
+
+classifier_url ="https://tfhub.dev/google/tf2-preview/mobilenet_v2/classification/2"
+image_shape = c(224L,224L,3L)
+
+classifier = layer_hub(handle=classifier_url, input_shape=image_shape)
+
+
+# run it on a single image 
+image_url <- "https://storage.googleapis.com/download.tensorflow.org/example_images/grace_hopper.jpg"
+
+img <- pins::pin(image_url, name = "grace_hopper") %>%
+  tensorflow::tf$io$read_file() %>% 
+  tensorflow::tf$image$decode_image(dtype = tf$float32) %>% 
+  tensorflow::tf$image$resize(size = image_shape[-3])
+img %>% 
+  as.array() %>% 
+  as.raster() %>% 
+  plot()
+
+
+result <- img %>% 
+  tf$expand_dims(0L) %>% 
+  classifier()
+
+predicted_class <- tf$argmax(result, axis = 1L) %>% as.integer()
+predicted_class
+
+
+labels_url <- "https://storage.googleapis.com/download.tensorflow.org/data/ImageNetLabels.txt"
+
+imagenet_labels <- pins::pin(labels_url, "imagenet_labels") %>% 
+  readLines()
+
+
+img %>% 
+  as.array() %>% 
+  as.raster() %>% 
+  plot()
+# 
+title(paste("Prediction:" , imagenet_labels[predicted_class + 1]))
+flowers <- pins::pin("https://storage.googleapis.com/download.tensorflow.org/example_images/flower_photos.tgz", "flower_photos")
+image_generator <- image_data_generator(rescale=1/255)
+image_data <- flowers[1] %>% 
+  dirname() %>% 
+  dirname() %>% 
+  flow_images_from_directory(image_generator, target_size = image_shape[-3])
+str(reticulate::iter_next(image_data))

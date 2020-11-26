@@ -22,86 +22,133 @@ from tensorflow.keras.applications.vgg16 import VGG16
 from tensorflow.keras.applications.vgg19 import VGG19
 
 
-path =  "/Users/austinwilson/coding/r/final-project/waste-recognition/DATASET/TRAIN"
-download_link = "https://www.kaggle.com/techsash/waste-classification-data/download"
-req = requests.get(download_link, allow_redirects = True)
-req.content
+path =  "/Users/austinwilson/coding/r/final-project/waste-recognition/DATASET"
+path_train = path + '/TRAIN'
+path_test = path + '/TEST'
 
-open(req.content,"wb")
-
-urllib.urlretrieve(download_link,"/Users/austinwilson/coding/r/final-project/waste-recognition/data2")
-open("data2", "wb").write(req.content)
 
 
 # class names
-class_names = os.listdir(path)[1:]
+# class_names = os.listdir(path_train)[1:] # 
+class_names = ['R','O']
 class_names
 
 # image names
-o_images_names = os.listdir(path + "/O")
-r_images_names = os.listdir(path + "/R")
+o_images_names_train = os.listdir(path_train + "/O")
+r_images_names_train = os.listdir(path_train + "/R")
+
+o_images_names_test = os.listdir(path_test + "/O")
+r_images_names_test = os.listdir(path_test + "/R")
 
 
-organic_images = []
-recyclable_images = []
+# size of image set 
+o_len_train = len(o_images_names_train)
+r_len_train = len(r_images_names_train)
+
+o_len_test = len(o_images_names_test)
+r_len_test = len(r_images_names_test)
+
+# number of images in train and test sets
+o_len_train # 12565
+r_len_train # 9999
+
+o_len_test # 1401
+r_len_test # 1112
+
+
+organic_images_train = []
+recyclable_images_train = []
+organic_image_test = []
+recyclable_image_test = []
 img_size = (128,128)
 
 
 # organic images as float64 numpy array
 subset = 1000
-for img_name in o_images_names[0:subset]:
+
+# write a function do this 
+def get_numpy_image_array(image_names):
+    numpy_img_array = []
+    for img_name in image_names:
+        # some images in grey scale
+        img = Image.open(path + "/O/" + img_name).convert("RGB")
+        img = img.resize(img_size)
+        img_array = np.asarray(img)
+        if img.size == (128,128):
+            numpy_img_array.append(img_array)
+    return numpy_img_array
+
+# building a numpy array for all the images in the training data
+for img_name in o_images_names_train:
 
     # some images in grey scale
     img = Image.open(path + "/O/" + img_name).convert("RGB")
     img = img.resize(img_size)
     img_array = np.asarray(img)
     if img.size == (128,128):
-        organic_images.append(img_array)
-organic_images = np.asarray(organic_images, dtype = "float64")
+        organic_images_train.append(img_array)
+organic_images_train = np.asarray(organic_images_train, dtype = "float64")
+
+# building a numpy array for all the images in the test data
+for img_name in o_images_names_test:
+
+    # some images in grey scale
+    img = Image.open(path + "/O/" + img_name).convert("RGB")
+    img = img.resize(img_size)
+    img_array = np.asarray(img)
+    if img.size == (128,128):
+        organic_images_test.append(img_array)
+organic_images_test = np.asarray(organic_images_test, dtype = "float64")
+
+
 
 
 # recyclable images as float64 np array
-for img_name in r_images_names[0:subset]:
+for img_name in r_images_names:
 
     # some images in grey scale
     img = Image.open(path + "/R/" + img_name).convert("RGB")
     img = img.resize(img_size)
     img_array = np.asarray(img)
     if img.size == (128,128):
-        recyclable_images.append(img_array)
-recyclable_images = np.asarray(recyclable_images, dtype = "float64")
+        recyclable_images_train.append(img_array)
+recyclable_images_train = np.asarray(recyclable_images_train, dtype = "float64")
 
 
 
 # confirming structural integrity of data
-print(organic_images.shape)
-print(organic_images.dtype)
-print(recyclable_images.shape)
-print(recyclable_images.dtype)
+print(organic_images_train.shape)
+print(organic_images_train.dtype)
+print(recyclable_images_train.shape)
+print(recyclable_images_train.dtype)
 
 
 # making a column for y
-y_organic = np.repeat("O",subset)
-y_recycle = np.repeat("R",subset)
+y_organic = np.repeat("O",o_len)
+y_recycle = np.repeat("R",r_len)
 
 # final data to be sent into the model 
-x = np.concatenate([organic_images,recyclable_images])
+x = np.concatenate([organic_images_train,recyclable_images_train])
 y = np.concatenate([y_organic,y_recycle])
+
+# check the shape 
+x.shape
+y.shape
+
 
 # setting up y values 
 le = LabelEncoder()
 y = le.fit_transform(y)
 y = tf.keras.utils.to_categorical(y)
 
+# normalize the data
+x = x / 255
 
 
-
-
+# train test split 
 x_train, x_test, y_train,y_test = train_test_split(x, y, test_size = .2, random_state = 42)
 
-############
-            #NORMALIZE THE DATA! -- divide everything by 255
-############
+
 
 # double check the size
 print(x_train.shape)
@@ -121,6 +168,8 @@ model_simple.compile(loss='categorical_crossentropy',optimizer='adam')
 
 # early stopping
 monitor = EarlyStopping(monitor='val_loss',min_delta=1e-3,patience=2,verbose=2,mode='auto')
+checkpointer = ModelCheckpoint(filepath=path+'model_simple.hdf5',verbose=0,save_best_only=True)
+# checkpointer256 = ModelCheckpoint(filepath='/content/drive/My Drive/180/final project/dnn/modelo256.hdf5',verbose=0,save_best_only=True)
 
 
 # training!!
@@ -128,7 +177,7 @@ model_simple.fit(x_train ,y_train,
                    batch_size = 20,
                    epochs = 20,
                    verbose=2,
-                   callbacks=[monitor],
+                   callbacks=[monitor, checkpointer],
                    validation_data=(x_test,y_test))
 
 

@@ -96,9 +96,11 @@ def img_array2(path, img_size = (128, 128)):
         all_img_array.append(img_array)
     return np.asarray(all_img_array, dtype="float64")
 
+o_x_train = img_array2(path = path_train + "/O/", )
 
 
-def get_numpy_image_array(path):
+
+def get_numpy_image_array(path, img_size = (128,128)):
     image_names_o = os.listdir(path + "/O")
     image_names_r = os.listdir(path + "/R")
     numpy_img_array_o = []
@@ -191,37 +193,42 @@ print(recyclable_images_train.dtype)
 
 
 
-o_len_train = len(organic_images_train)
-o_len_train
-r_len_train = len(recyclable_images_train)
-r_len_train
-
-o_len_test = len(organic_images_test)
-r_len_test = len(recyclable_images_test)
 
 
 
 
-# making a column for y
-y_organic_train = np.repeat("O",o_len_train)
-y_organic_train.shape
-y_recycle_train = np.repeat("R",r_len_train)
-y_recycle_train.shape
 
-y_organic_test = np.repeat("O",o_len_test)
-y_recycle_test = np.repeat("R",r_len_test)
+# making a column for y training
+y_organic_train = np.repeat("O",len(organic_images_train))
+y_recycle_train = np.repeat("R",len(recyclable_images_train))
+
+
+# checkiing to make sure same size for training set 
+organic_images_train.shape[0] == y_organic_train.shape[0]
+recyclable_images_train.shape[0] == y_recycle_train.shape[0]
+
+
+# building the test set for y
+y_organic_test = np.repeat("O",len(organic_images_test))
+y_recycle_test = np.repeat("R",len(recyclable_images_test))
+
+# testing shape of test set
+organic_images_test.shape[0] == y_organic_test.shape[0]
+recyclable_images_test.shape[0] == y_recycle_test.shape[0]
 
 # final data to be sent into the model 
-x = np.concatenate([organic_images_train,recyclable_images_train])
-x.shape
+# x = np.concatenate([organic_images_train,recyclable_images_train])
+# x.shape
 
 x_train = np.concatenate([organic_images_train,recyclable_images_train])
 x_test = np.concatenate([organic_images_test,recyclable_images_test])
 
 
 
-y = np.concatenate([y_organic_train,y_recycle_train])
-y.shape
+# y = np.concatenate([y_organic_train,y_recycle_train])
+# y.shape
+
+
 y_train = np.concatenate([y_organic_train,y_recycle_train])
 y_test = np.concatenate([y_organic_test,y_recycle_test])
 
@@ -230,27 +237,36 @@ y_test = np.concatenate([y_organic_test,y_recycle_test])
 # y.shape
 
 
+'''
+TESTING SHAPE HERE
+'''
+
+x_train.shape[0] == y_train.shape[0]
+x_test.shape[0] == y_test.shape[0]
+
+
 # setting up y values 
-le = LabelEncoder()
-y = le.fit_transform(y)
-y = tf.keras.utils.to_categorical(y)
+# le = LabelEncoder()
+# y = le.fit_transform(y)
+# y = tf.keras.utils.to_categorical(y)
 
 le_1 = LabelEncoder()
-le_2 = LabelEncoder()
 y_train = le_1.fit_transform(y_train)
 y_train = tf.keras.utils.to_categorical(y_train)
+
+le_2 = LabelEncoder()
 y_test = le_2.fit_transform(y_test)
 y_test = tf.keras.utils.to_categorical(y_test)
 
 # normalize the data
-x = x / 255
+# x = x / 255
 
 x_train = x_train / 255
 x_test = x_test / 255
 
 
 # train test split 
-x_train, x_test, y_train,y_test = train_test_split(x, y, test_size = .2, random_state = 42)
+# x_train, x_test, y_train,y_test = train_test_split(x, y, test_size = .2, random_state = 42)
 
 
 # double check the size
@@ -272,17 +288,18 @@ model_simple.compile(loss='categorical_crossentropy',optimizer='adam')
 # early stopping
 path_to_model = '/Users/austinwilson/coding/r/final-project/waste-recognition/models/'
 monitor = EarlyStopping(monitor='val_loss',min_delta=1e-3,patience=2,verbose=2,mode='auto')
-checkpointer = ModelCheckpoint(filepath=path_to_model+'model_simple2.hdf5',verbose=0,save_best_only=True)
+checkpointer = ModelCheckpoint(filepath=path_to_model+'model_simple4.hdf5',verbose=0,save_best_only=True)
 # checkpointer256 = ModelCheckpoint(filepath='/content/drive/My Drive/180/final project/dnn/modelo256.hdf5',verbose=0,save_best_only=True)
 
 
 # training!!
-model_simple.fit(x_train ,y_train,
-                   batch_size = 20,
-                   epochs = 20,
-                   verbose=2,
-                   callbacks=[monitor, checkpointer],
-                   validation_data=(x_test,y_test))
+for i in range(5):
+    model_simple.fit(x_train ,y_train,
+                    batch_size = 20,
+                    epochs = 20,
+                    verbose=2,
+                    callbacks=[monitor, checkpointer],
+                    validation_data=(x_test,y_test))
 
 
 y_true = np.argmax(y_test,axis = 1)

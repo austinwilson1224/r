@@ -107,7 +107,7 @@ def get_numpy_image_array(path, img_size = (128,128)):
     numpy_img_array_r = []
 
     # for the images in O category 
-    for img_name in image_names_o:
+    for img_name in image_names_o[:1000]:
         # some images in grey scale
         img = Image.open(path + "/O/" + img_name).convert("RGB")
         img = img.resize(img_size)
@@ -116,7 +116,7 @@ def get_numpy_image_array(path, img_size = (128,128)):
             numpy_img_array_o.append(img_array)
 
     # for the images in R category 
-    for img_name in image_names_r:
+    for img_name in image_names_r[:1000]:
         # some images in grey scale
         img = Image.open(path + "/R/" + img_name).convert("RGB")
         img = img.resize(img_size)
@@ -266,7 +266,7 @@ x_test = x_test / 255
 
 
 # train test split 
-# x_train, x_test, y_train,y_test = train_test_split(x, y, test_size = .2, random_state = 42)
+x_train, x_test, y_train,y_test = train_test_split(x_train, y_train, test_size = .2, random_state = 42)
 
 
 # double check the size
@@ -331,7 +331,7 @@ model_19_128.add(Flatten())
 model_19_128.add(Dense(2,activation='softmax'))
 
 
-checkpointer_vgg19_128 = ModelCheckpoint(filepath='path_to_model/vgg19_1.hdf5',verbose=0,save_best_only=True)
+checkpointer_vgg19_128 = ModelCheckpoint(filepath='/Users/austinwilson/coding/r/final-project/waste-recognition/models/vgg19_1.hdf5',verbose=0,save_best_only=True)
 monitor = EarlyStopping(monitor='val_loss',min_delta=1e-3,patience=2,verbose=2,mode='auto')
 model_19_128.compile(optimizer='adam',loss='categorical_crossentropy')
 
@@ -343,7 +343,10 @@ model_19_128.fit(x_train,y_train,
             callbacks=[monitor,checkpointer_vgg19_128],
             validation_data=(x_test,y_test))
 
+
+
 y_true = np.argmax(y_test,axis = 1)
 y_pred = model_19_128.predict(x_test)
 y_pred = np.argmax(y_pred,axis = 1)
-f1_vgg19 = metrics.f1_score(y_true,y_pred,method="weighted")
+f1_vgg19 = metrics.f1_score(y_true,y_pred,average="weighted")
+f1_vgg19

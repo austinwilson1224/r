@@ -2,3 +2,5 @@
 .RData
 .RHistory
 DATASET
+*.hdf5
+.DS_STORE

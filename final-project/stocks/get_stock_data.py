@@ -23,10 +23,33 @@ import os
 
 # these are the tickers stored in tickers.txt add whatever companies you want 
 tickers = open("tickers.txt","r").read().split("\n")
+tickers = [
+    "AAPL",
+    "AMZN",
+    "MMM",
+    "GOOGL",
+    "MSFT",
+    "INTC",
+    "IBM",
+    "PFE",
+    "TGT",
+    "TMUS",
+    "TWTR",
+    "UNP",
+    "UAL",
+    "UNH",
+    "UPS",
+    "CVX",
+    "VLO",
+    "WM",
+    "BXP",
+    "CPB",
+    "CAT"
+]
 tickers
 
 ######### get the data for each time period of the corresponding pandemic 
-def get_data_from_yahoo_pandemic(start = dt.datetime(year = 2020, month = 10, day = 1), end = dt.datetime(year = 2020, month = 11, day = 1)):
+def get_data_from_yahoo(start = dt.datetime(year = 2020, month = 10, day = 1), end = dt.datetime(year = 2020, month = 11, day = 1)):
     # with open('sp500tickers.pickle','rb') as f:
     #         tickers = pickle.load(f)
     if not os.path.exists('stock_dfs'):
@@ -52,4 +75,9 @@ def get_data_from_yahoo_pandemic(start = dt.datetime(year = 2020, month = 10, da
             print('Already have {}'.format(ticker))
 
 
-get_data_from_yahoo_pandemic()
+
+
+start = dt.datetime(year = 2000, month = 1, day = 1)
+end = dt.datetime(year = 2020, month = 11, day = 26)
+
+get_data_from_yahoo(start = start, end = end)

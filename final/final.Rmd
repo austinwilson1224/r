@@ -15,8 +15,8 @@ date: 16 December 2020
 Define a function `plot_red` as a wrapper function to `plot` that changes the default color to red (`col = "red"`).
 
 ```{r}
-plot_red = function(x, col = "red") {
-  plot(x = x, col = col)
+plot_red = function(x) {
+  plot(x = x, col = "red")
 }
 plot_red(1:10)
 ```
@@ -29,11 +29,14 @@ Show that the model predicts 19.54463 when x is 20.
 
 ```{r}
 x = 1:10
-
 y = x + sin(x)
-data = data.frame(x,y)
-model = lm(y ~ x, data = data)
-pred = model$coefficients[1] + model$coefficients[2] * 20
+
+train = data.frame(x,y)
+model = lm(y ~ x, data = train)
+
+test = data.frame(x=20)
+pred = predict(model,test)
+
 pred
 ```
 
@@ -56,8 +59,7 @@ Read all of these files in and combine them into one single data frame, `d`.
 If you do it correctly, `d` will have 30 rows.
 You can do this idiomatically in three lines of code.
 
-```{r, echo=FALSE, results='hide',message=FALSE}
-getwd()
+```{r}
 file_names = list.files("letters_for_stat128_final", full.names = TRUE)
 letters = lapply(file_names, read.csv)
 d = do.call(rbind,letters)
@@ -75,11 +77,9 @@ Extract the 10 digit phone numbers from the following character vector.
 s = c("My number is 593-461-0728"
       , "My address is 123 Fake Street, and my phone number is 578-163-4290, thanks."
       , "Either call 269-501-3748 or email foo@bar.com.")
-re = regexec("[0-9][0-9][0-9]-[0-9][0-9][0-9]-[0-9][0-9][0-9][0-9]",s)
+re = regexec("[0-9]{3}-[0-9]{3}-[0-9]{4}",s)
 result = regmatches(s,re)
 result
-
-
 goal = c("593-461-0728", "578-163-4290", "269-501-3748")
 ```
 
@@ -98,7 +98,7 @@ print.final = function(s,...) {
   cat("We're done!")
 }
 print(s)
-
+s
 ```
 
 Here's the behavior you should see in the console after you define your method:

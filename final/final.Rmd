@@ -94,10 +94,11 @@ s = "This is it?"
 
 class(s) = c("final", class(s))
 
-print.final = function(s,...) {
+print.final = function(...) {
   cat("We're done!")
 }
 print(s)
+
 s
 ```
 
